@@ -1,0 +1,146 @@
+{
+  "summary": {
+    "total_tests": 13,
+    "passed_tests": 13,
+    "failed_tests": 0,
+    "success_rate": 100.0
+  },
+  "test_results": [
+    {
+      "test_name": "API Health Check",
+      "success": true,
+      "details": "API endpoint accessible at https://jewellerp-gst.preview.emergentagent.com/api",
+      "response_data": {
+        "message": "Gold Jewellery ERP API",
+        "version": "1.0.0"
+      },
+      "timestamp": "2026-01-14T17:23:51.966774"
+    },
+    {
+      "test_name": "User Registration - admin role",
+      "success": true,
+      "details": "Register user with admin role",
+      "response_data": {
+        "user_id": "8beee6f4-dac9-4881-984a-d8658afa4bed"
+      },
+      "timestamp": "2026-01-14T17:23:52.230216"
+    },
+    {
+      "test_name": "User Registration - manager role",
+      "success": true,
+      "details": "Register user with manager role",
+      "response_data": {
+        "user_id": "20990583-3608-42ca-a14e-4caa8e2563d5"
+      },
+      "timestamp": "2026-01-14T17:23:52.486746"
+    },
+    {
+      "test_name": "User Registration - sales role",
+      "success": true,
+      "details": "Register user with sales role",
+      "response_data": {
+        "user_id": "31a6e1bf-fad9-4dcd-9b35-3cc4e916f2c9"
+      },
+      "timestamp": "2026-01-14T17:23:52.748272"
+    },
+    {
+      "test_name": "Login - Valid Credentials",
+      "success": true,
+      "details": "Login successful for admin@jewellerp.com",
+      "response_data": {
+        "has_token": true,
+        "user_role": "admin"
+      },
+      "timestamp": "2026-01-14T17:23:53.011445"
+    },
+    {
+      "test_name": "Login - Invalid Credentials (admin@jewellerp.com)",
+      "success": true,
+      "details": "Correctly rejected invalid credentials",
+      "response_data": {
+        "detail": "Incorrect email or password"
+      },
+      "timestamp": "2026-01-14T17:23:53.270176"
+    },
+    {
+      "test_name": "Login - Invalid Credentials (nonexistent@jewellerp.com)",
+      "success": true,
+      "details": "Correctly rejected invalid credentials",
+      "response_data": {
+        "detail": "Incorrect email or password"
+      },
+      "timestamp": "2026-01-14T17:23:53.309785"
+    },
+    {
+      "test_name": "Login - Invalid Credentials (invalid-email)",
+      "success": true,
+      "details": "Correctly rejected invalid credentials",
+      "response_data": {
+        "detail": [
+          {
+            "type": "value_error",
+            "loc": [
+              "body",
+              "email"
+            ],
+            "msg": "value is not a valid email address: An email address must have an @-sign.",
+            "input": "invalid-email",
+            "ctx": {
+              "reason": "An email address must have an @-sign."
+            }
+          }
+        ]
+      },
+      "timestamp": "2026-01-14T17:23:53.350693"
+    },
+    {
+      "test_name": "Get Current User Info",
+      "success": true,
+      "details": "Retrieved user info for admin@jewellerp.com",
+      "response_data": {
+        "user_id": "dae8679c-a179-47f2-ad3a-e1c28879c783",
+        "role": "admin"
+      },
+      "timestamp": "2026-01-14T17:23:53.425265"
+    },
+    {
+      "test_name": "Get All Users List",
+      "success": true,
+      "details": "Retrieved 7 users",
+      "response_data": {
+        "user_count": 7
+      },
+      "timestamp": "2026-01-14T17:23:53.462623"
+    },
+    {
+      "test_name": "Get All Users List",
+      "success": true,
+      "details": "Retrieved 7 users",
+      "response_data": {
+        "user_count": 7
+      },
+      "timestamp": "2026-01-14T17:23:53.496372"
+    },
+    {
+      "test_name": "Toggle User Active Status",
+      "success": true,
+      "details": "User ccd2e164-6ad1-4142-8899-4ef56890a275 status changed from False to True",
+      "response_data": {
+        "user_id": "ccd2e164-6ad1-4142-8899-4ef56890a275",
+        "original_status": false,
+        "new_status": true
+      },
+      "timestamp": "2026-01-14T17:23:53.531534"
+    },
+    {
+      "test_name": "Unauthorized Access Protection",
+      "success": true,
+      "details": "Correctly rejected request without token",
+      "response_data": {
+        "detail": "Not authenticated"
+      },
+      "timestamp": "2026-01-14T17:23:53.565647"
+    }
+  ],
+  "failed_tests": []
+}
