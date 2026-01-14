@@ -15,6 +15,7 @@ import PurchasePage from './pages/PurchasePage';
 import SuppliersPage from './pages/SuppliersPage';
 import GSTReportsPage from './pages/GSTReportsPage';
 import GoldRatesPage from './pages/GoldRatesPage';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
