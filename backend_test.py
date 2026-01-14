@@ -314,7 +314,7 @@ def main():
                 },
                 "test_results": tester.test_results,
                 "failed_tests": tester.get_failed_tests()
-            }, indent=2)
+            }, f, indent=2)
         
         return 0 if success else 1
         
