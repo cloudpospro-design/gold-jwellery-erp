@@ -189,22 +189,6 @@ function AppRoutes() {
         </PrivateRoute>
       } />
 
-      <Route path="/gst-reports" element={
-        <PrivateRoute>
-          <DashboardLayout>
-            <ComingSoon title="GST Reports" />
-          </DashboardLayout>
-        </PrivateRoute>
-      } />
-
-      <Route path="/gold-rates" element={
-        <PrivateRoute>
-          <DashboardLayout>
-            <ComingSoon title="Gold Rates Management" />
-          </DashboardLayout>
-        </PrivateRoute>
-      } />
-
       <Route path="/settings" element={
         <PrivateRoute>
           <DashboardLayout>
