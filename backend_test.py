@@ -1456,6 +1456,21 @@ class JewelleryERPTester:
         self.test_sales_summary()
         self.test_payment_method_tracking()
 
+        print("\n" + "=" * 60)
+        print("🛒 Starting Purchase Management Tests")
+        print("=" * 60)
+
+        # Test purchase management
+        self.test_create_supplier()
+        self.test_get_suppliers()
+        self.test_update_supplier()
+        self.test_create_purchase_order()
+        self.test_get_purchase_orders()
+        self.test_get_single_purchase_order()
+        self.test_receive_purchase_order()
+        self.test_old_gold_exchange()
+        self.test_get_old_gold_exchanges()
+
         # Print summary
         print("\n" + "=" * 60)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
