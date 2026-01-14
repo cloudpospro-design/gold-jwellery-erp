@@ -138,14 +138,16 @@ class JewelleryERPTester:
     def test_login_invalid_credentials(self):
         """Test login with invalid credentials"""
         invalid_cases = [
-            {"email": "admin@jewellerp.com", "password": "wrongpassword"},
-            {"email": "nonexistent@jewellerp.com", "password": "admin123"},
-            {"email": "invalid-email", "password": "admin123"}
+            {"email": "admin@jewellerp.com", "password": "wrongpassword", "expected": 401},
+            {"email": "nonexistent@jewellerp.com", "password": "admin123", "expected": 401},
+            {"email": "invalid-email", "password": "admin123", "expected": 422}  # Validation error
         ]
 
         for case in invalid_cases:
-            success, response = self.make_request('POST', 'auth/login', case, expected_status=401)
-            # For invalid login, we expect 401, so success means we got the expected error
+            success, response = self.make_request('POST', 'auth/login', 
+                                                {"email": case["email"], "password": case["password"]}, 
+                                                expected_status=case["expected"])
+            # For invalid login, we expect the specified error code
             self.log_test(
                 f"Login - Invalid Credentials ({case['email']})",
                 success,
