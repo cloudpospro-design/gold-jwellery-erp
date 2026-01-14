@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum
 
 class UserRole(str, Enum):
+    SUPERADMIN = "superadmin"
     ADMIN = "admin"
     MANAGER = "manager"
     ACCOUNTANT = "accountant"
@@ -45,6 +46,7 @@ class PermissionUpdate(BaseModel):
 
 # Role permissions mapping
 ROLE_PERMISSIONS = {
+    UserRole.SUPERADMIN: ['all', 'superadmin'],
     UserRole.ADMIN: ['all'],
     UserRole.MANAGER: ['users_read', 'inventory_all', 'sales_all', 'purchase_all', 'customer_all', 'reports_read'],
     UserRole.ACCOUNTANT: ['inventory_read', 'sales_read', 'purchase_read', 'customer_read', 'reports_all', 'gst_all'],
