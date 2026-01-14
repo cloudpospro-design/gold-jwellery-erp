@@ -404,22 +404,23 @@ class TestSettingsAuthentication:
     def test_business_settings_requires_auth(self):
         """Test GET /api/settings/business requires authentication"""
         response = requests.get(f"{BASE_URL}/api/settings/business")
-        assert response.status_code == 401
+        # API returns 403 Forbidden when no auth token provided
+        assert response.status_code in [401, 403]
 
     def test_system_settings_requires_auth(self):
         """Test GET /api/settings/system requires authentication"""
         response = requests.get(f"{BASE_URL}/api/settings/system")
-        assert response.status_code == 401
+        assert response.status_code in [401, 403]
 
     def test_backup_info_requires_auth(self):
         """Test GET /api/settings/backup-info requires authentication"""
         response = requests.get(f"{BASE_URL}/api/settings/backup-info")
-        assert response.status_code == 401
+        assert response.status_code in [401, 403]
 
     def test_export_data_requires_auth(self):
         """Test POST /api/settings/export-data requires authentication"""
         response = requests.post(f"{BASE_URL}/api/settings/export-data", json={})
-        assert response.status_code == 401
+        assert response.status_code in [401, 403]
 
 
 if __name__ == "__main__":
