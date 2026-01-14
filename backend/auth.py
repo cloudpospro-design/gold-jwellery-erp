@@ -47,7 +47,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         )
     return payload
 
-async def check_permission(required_permission: str):
+def check_permission(required_permission: str):
     async def permission_checker(current_user: dict = Depends(get_current_user)):
         user_permissions = current_user.get('permissions', [])
         if required_permission not in user_permissions and 'all' not in user_permissions:
