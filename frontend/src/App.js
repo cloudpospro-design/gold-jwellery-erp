@@ -101,11 +101,28 @@ function AppRoutes() {
       <Route path="/sales" element={
         <PrivateRoute>
           <DashboardLayout>
-            <ComingSoon title="Sales Management" />
+            <SalesPage />
           </DashboardLayout>
         </PrivateRoute>
       } />
 
+      <Route path="/sales/create" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <CreateSalePage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/sales/:id" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <InvoiceDetailPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      {/* Coming Soon Pages */}
       <Route path="/purchase" element={
         <PrivateRoute>
           <DashboardLayout>
