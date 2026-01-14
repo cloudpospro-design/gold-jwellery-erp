@@ -35,6 +35,23 @@ const InvoiceDetailPage = () => {
     window.print();
   };
 
+  const handleSendEmail = async () => {
+    if (!sale.customer.email) {
+      toast.error('Customer email not available');
+      return;
+    }
+
+    try {
+      await api.post('/notifications/send-invoice-email', {
+        invoice_id: id,
+        customer_email: sale.customer.email
+      });
+      toast.success('Invoice sent to customer email');
+    } catch (error) {
+      toast.error('Failed to send invoice');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
