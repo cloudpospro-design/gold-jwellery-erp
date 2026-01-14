@@ -1,7 +1,7 @@
 {
   "summary": {
-    "total_tests": 29,
-    "passed_tests": 29,
+    "total_tests": 39,
+    "passed_tests": 39,
     "failed_tests": 0,
     "success_rate": 100.0
   },
@@ -14,34 +14,34 @@
         "message": "Gold Jewellery ERP API",
         "version": "1.0.0"
       },
-      "timestamp": "2026-01-14T17:37:53.998757"
+      "timestamp": "2026-01-14T17:49:05.615918"
     },
     {
       "test_name": "User Registration - admin role",
       "success": true,
       "details": "Register user with admin role",
       "response_data": {
-        "user_id": "9e4b7a9a-207b-4ae0-bccc-5c6b7dac698f"
+        "user_id": "537c0f05-bfe0-4466-8003-b8ebc8d6ccda"
       },
-      "timestamp": "2026-01-14T17:37:54.263439"
+      "timestamp": "2026-01-14T17:49:05.885317"
     },
     {
       "test_name": "User Registration - manager role",
       "success": true,
       "details": "Register user with manager role",
       "response_data": {
-        "user_id": "e262b224-46a1-4bc1-8b44-cf2656e52b90"
+        "user_id": "0dcbfab7-5360-4133-b64e-7c80a64ba96f"
       },
-      "timestamp": "2026-01-14T17:37:54.563565"
+      "timestamp": "2026-01-14T17:49:06.145261"
     },
     {
       "test_name": "User Registration - sales role",
       "success": true,
       "details": "Register user with sales role",
       "response_data": {
-        "user_id": "950f130f-b507-4839-8306-beb01eb636e1"
+        "user_id": "7ce982ad-51ec-4d6e-9cc1-b3a001576c2e"
       },
-      "timestamp": "2026-01-14T17:37:54.825756"
+      "timestamp": "2026-01-14T17:49:06.405800"
     },
     {
       "test_name": "Login - Valid Credentials",
@@ -51,7 +51,7 @@
         "has_token": true,
         "user_role": "admin"
       },
-      "timestamp": "2026-01-14T17:37:55.088557"
+      "timestamp": "2026-01-14T17:49:06.663863"
     },
     {
       "test_name": "Login - Invalid Credentials (admin@jewellerp.com)",
@@ -60,7 +60,7 @@
       "response_data": {
         "detail": "Incorrect email or password"
       },
-      "timestamp": "2026-01-14T17:37:55.349707"
+      "timestamp": "2026-01-14T17:49:06.922070"
     },
     {
       "test_name": "Login - Invalid Credentials (nonexistent@jewellerp.com)",
@@ -69,7 +69,7 @@
       "response_data": {
         "detail": "Incorrect email or password"
       },
-      "timestamp": "2026-01-14T17:37:55.385435"
+      "timestamp": "2026-01-14T17:49:06.999238"
     },
     {
       "test_name": "Login - Invalid Credentials (invalid-email)",
@@ -91,7 +91,7 @@
           }
         ]
       },
-      "timestamp": "2026-01-14T17:37:55.432657"
+      "timestamp": "2026-01-14T17:49:07.038264"
     },
     {
       "test_name": "Get Current User Info",
@@ -101,36 +101,36 @@
         "user_id": "dae8679c-a179-47f2-ad3a-e1c28879c783",
         "role": "admin"
       },
-      "timestamp": "2026-01-14T17:37:55.467270"
+      "timestamp": "2026-01-14T17:49:07.073542"
     },
     {
       "test_name": "Get All Users List",
       "success": true,
-      "details": "Retrieved 10 users",
+      "details": "Retrieved 14 users",
       "response_data": {
-        "user_count": 10
+        "user_count": 14
       },
-      "timestamp": "2026-01-14T17:37:55.504016"
+      "timestamp": "2026-01-14T17:49:07.106830"
     },
     {
       "test_name": "Get All Users List",
       "success": true,
-      "details": "Retrieved 10 users",
+      "details": "Retrieved 14 users",
       "response_data": {
-        "user_count": 10
+        "user_count": 14
       },
-      "timestamp": "2026-01-14T17:37:55.537852"
+      "timestamp": "2026-01-14T17:49:07.150717"
     },
     {
       "test_name": "Toggle User Active Status",
       "success": true,
-      "details": "User ccd2e164-6ad1-4142-8899-4ef56890a275 status changed from True to False",
+      "details": "User ccd2e164-6ad1-4142-8899-4ef56890a275 status changed from False to True",
       "response_data": {
         "user_id": "ccd2e164-6ad1-4142-8899-4ef56890a275",
-        "original_status": true,
-        "new_status": false
+        "original_status": false,
+        "new_status": true
       },
-      "timestamp": "2026-01-14T17:37:55.576911"
+      "timestamp": "2026-01-14T17:49:07.185983"
     },
     {
       "test_name": "Unauthorized Access Protection",
@@ -139,117 +139,117 @@
       "response_data": {
         "detail": "Not authenticated"
       },
-      "timestamp": "2026-01-14T17:37:55.610799"
+      "timestamp": "2026-01-14T17:49:07.220948"
     },
     {
       "test_name": "Create Category - Necklace",
       "success": true,
       "details": "Created Necklace category",
       "response_data": {
-        "category_id": "e43150aa-bafc-4b1e-bfcc-4f54de682a12"
+        "category_id": "f54b494b-afa8-476d-8e88-ee21923e0677"
       },
-      "timestamp": "2026-01-14T17:37:55.658687"
+      "timestamp": "2026-01-14T17:49:07.258345"
     },
     {
       "test_name": "Create Category - Ring",
       "success": true,
       "details": "Created Ring category",
       "response_data": {
-        "category_id": "1baf1a57-746e-4966-a1f1-0a8de255acf1"
+        "category_id": "61b667d8-8d65-44f0-99b4-245e314e738b"
       },
-      "timestamp": "2026-01-14T17:37:55.694079"
+      "timestamp": "2026-01-14T17:49:07.291931"
     },
     {
       "test_name": "Create Category - Bangle",
       "success": true,
       "details": "Created Bangle category",
       "response_data": {
-        "category_id": "e2eba7d8-5a95-4921-91c5-4a8464e909d1"
+        "category_id": "697f07ca-58b5-4e44-83d0-e8194587c0f3"
       },
-      "timestamp": "2026-01-14T17:37:55.728416"
+      "timestamp": "2026-01-14T17:49:07.326947"
     },
     {
       "test_name": "Create Category - Earring",
       "success": true,
       "details": "Created Earring category",
       "response_data": {
-        "category_id": "9a8dbef0-449a-4924-9325-0f0199e610d4"
+        "category_id": "8d2ed008-0d96-42a8-867e-eb1d114ff4d5"
       },
-      "timestamp": "2026-01-14T17:37:55.764307"
+      "timestamp": "2026-01-14T17:49:07.362035"
     },
     {
       "test_name": "Get All Categories",
       "success": true,
-      "details": "Retrieved 8 categories",
+      "details": "Retrieved 12 categories",
       "response_data": {
-        "category_count": 8
+        "category_count": 12
       },
-      "timestamp": "2026-01-14T17:37:55.798505"
+      "timestamp": "2026-01-14T17:49:07.399052"
     },
     {
       "test_name": "Get All Categories",
       "success": true,
-      "details": "Retrieved 8 categories",
+      "details": "Retrieved 12 categories",
       "response_data": {
-        "category_count": 8
+        "category_count": 12
       },
-      "timestamp": "2026-01-14T17:37:55.838650"
+      "timestamp": "2026-01-14T17:49:07.433767"
     },
     {
       "test_name": "Create Product with Jewellery Attributes",
       "success": true,
       "details": "Product created with selling price \u20b936050.0 (expected \u20b936050.0)",
       "response_data": {
-        "product_id": "2574a4e2-dd4e-4032-9616-49f3b2eea3ae",
+        "product_id": "2d2eeb1c-d2a1-4519-82c0-801a08af4746",
         "selling_price": 36050.0
       },
-      "timestamp": "2026-01-14T17:37:55.883438"
+      "timestamp": "2026-01-14T17:49:07.472140"
     },
     {
       "test_name": "Get All Products",
       "success": true,
-      "details": "Retrieved 5 products",
+      "details": "Retrieved 8 products",
       "response_data": {
-        "product_count": 5
+        "product_count": 8
       },
-      "timestamp": "2026-01-14T17:37:55.927430"
+      "timestamp": "2026-01-14T17:49:07.505345"
     },
     {
       "test_name": "Get Products by Category - Necklace",
       "success": true,
-      "details": "Retrieved 2 products for category Necklace",
+      "details": "Retrieved 3 products for category Necklace",
       "response_data": {
-        "filtered_count": 2
+        "filtered_count": 3
       },
-      "timestamp": "2026-01-14T17:37:56.005883"
+      "timestamp": "2026-01-14T17:49:07.538111"
     },
     {
       "test_name": "Get Low Stock Products",
       "success": true,
-      "details": "Retrieved 1 low stock products",
+      "details": "Retrieved 2 low stock products",
       "response_data": {
-        "low_stock_count": 1
+        "low_stock_count": 2
       },
-      "timestamp": "2026-01-14T17:37:56.043281"
+      "timestamp": "2026-01-14T17:49:07.570273"
     },
     {
-      "test_name": "Search Products - 'Tradi'",
+      "test_name": "Search Products - 'Updat'",
       "success": true,
-      "details": "Found 1 products matching 'Tradi'",
+      "details": "Found 1 products matching 'Updat'",
       "response_data": {
         "search_results": 1
       },
-      "timestamp": "2026-01-14T17:37:56.079590"
+      "timestamp": "2026-01-14T17:49:07.642869"
     },
     {
       "test_name": "Get Single Product by ID",
       "success": true,
-      "details": "Product 2574a4e2-dd4e-4032-9616-49f3b2eea3ae retrieved with all required fields",
+      "details": "Product 2d2eeb1c-d2a1-4519-82c0-801a08af4746 retrieved with all required fields",
       "response_data": {
-        "product_id": "2574a4e2-dd4e-4032-9616-49f3b2eea3ae",
+        "product_id": "2d2eeb1c-d2a1-4519-82c0-801a08af4746",
         "has_all_fields": true
       },
-      "timestamp": "2026-01-14T17:37:56.111734"
+      "timestamp": "2026-01-14T17:49:07.675033"
     },
     {
       "test_name": "Update Product Details",
@@ -259,17 +259,17 @@
         "product_id": "862fd27d-80fb-42af-921b-6148a4d4b674",
         "updates_applied": true
       },
-      "timestamp": "2026-01-14T17:37:56.219021"
+      "timestamp": "2026-01-14T17:49:07.753727"
     },
     {
       "test_name": "Update Product Stock",
       "success": true,
-      "details": "Stock updated from 5 to 10 (expected 10), Low stock: False",
+      "details": "Stock updated from 9 to 14 (expected 14), Low stock: False",
       "response_data": {
         "product_id": "862fd27d-80fb-42af-921b-6148a4d4b674",
         "stock_correct": true
       },
-      "timestamp": "2026-01-14T17:37:56.316730"
+      "timestamp": "2026-01-14T17:49:07.860026"
     },
     {
       "test_name": "Low Stock Detection",
@@ -280,17 +280,120 @@
         "threshold": 5,
         "is_low_stock": true
       },
-      "timestamp": "2026-01-14T17:37:56.399259"
+      "timestamp": "2026-01-14T17:49:07.941451"
     },
     {
       "test_name": "Delete Product",
       "success": true,
       "details": "Product deleted and verified as removed",
       "response_data": {
-        "product_id": "1928f055-c5a4-4df6-9460-af097439ad4b",
+        "product_id": "0fcbc514-6885-4575-9532-61016d3c5238",
         "deletion_verified": true
       },
-      "timestamp": "2026-01-14T17:37:56.502835"
+      "timestamp": "2026-01-14T17:49:08.048156"
+    },
+    {
+      "test_name": "Create Customer with Address Details",
+      "success": true,
+      "details": "Customer created with all required fields",
+      "response_data": {
+        "customer_id": "4a78691d-9f43-478c-90a7-a1f97009ceeb",
+        "has_all_fields": true
+      },
+      "timestamp": "2026-01-14T17:49:08.084389"
+    },
+    {
+      "test_name": "Get All Customers",
+      "success": true,
+      "details": "Retrieved 2 customers",
+      "response_data": {
+        "customer_count": 2
+      },
+      "timestamp": "2026-01-14T17:49:08.116552"
+    },
+    {
+      "test_name": "Get All Customers",
+      "success": true,
+      "details": "Retrieved 2 customers",
+      "response_data": {
+        "customer_count": 2
+      },
+      "timestamp": "2026-01-14T17:49:08.150777"
+    },
+    {
+      "test_name": "Create Sale with GST Calculation & Stock Reduction",
+      "success": true,
+      "details": "Sale created - Invoice: True, GST (CGST+SGST (intra-state)): True, Stock reduced: True",
+      "response_data": {
+        "sale_id": "43009ea9-c996-436f-b749-470ba96c0982",
+        "invoice_number": "INV-2024-00002",
+        "gst_breakdown": {
+          "cgst": 600.0,
+          "sgst": 600.0,
+          "igst": 0.0,
+          "total_tax": 1200.0
+        },
+        "checks_passed": true
+      },
+      "timestamp": "2026-01-14T17:49:08.264990"
+    },
+    {
+      "test_name": "Get All Sales",
+      "success": true,
+      "details": "Retrieved 2 sales",
+      "response_data": {
+        "sales_count": 2
+      },
+      "timestamp": "2026-01-14T17:49:08.299285"
+    },
+    {
+      "test_name": "Get Sales by Status - Completed",
+      "success": true,
+      "details": "Retrieved 2 completed sales",
+      "response_data": {
+        "completed_sales_count": 2
+      },
+      "timestamp": "2026-01-14T17:49:08.337673"
+    },
+    {
+      "test_name": "Get Single Sale by ID",
+      "success": true,
+      "details": "Sale 43009ea9-c996-436f-b749-470ba96c0982 retrieved with all required fields",
+      "response_data": {
+        "sale_id": "43009ea9-c996-436f-b749-470ba96c0982",
+        "has_all_fields": true
+      },
+      "timestamp": "2026-01-14T17:49:08.412301"
+    },
+    {
+      "test_name": "Sales Summary Statistics",
+      "success": true,
+      "details": "Summary: 2 total sales, \u20b9342428.65 revenue",
+      "response_data": {
+        "total_sales": 2,
+        "total_revenue": 342428.65,
+        "today_stats": "2 sales, \u20b9342428.65"
+      },
+      "timestamp": "2026-01-14T17:49:08.449905"
+    },
+    {
+      "test_name": "Get All Customers",
+      "success": true,
+      "details": "Retrieved 2 customers",
+      "response_data": {
+        "customer_count": 2
+      },
+      "timestamp": "2026-01-14T17:49:08.486369"
+    },
+    {
+      "test_name": "Payment Method Tracking",
+      "success": true,
+      "details": "Successfully tested 4/4 payment methods",
+      "response_data": {
+        "methods_tested": 4,
+        "total_methods": 4
+      },
+      "timestamp": "2026-01-14T17:49:08.670661"
     }
   ],
   "failed_tests": []
