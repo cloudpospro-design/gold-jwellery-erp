@@ -201,6 +201,14 @@ function AppRoutes() {
           </DashboardLayout>
         </PrivateRoute>
       } />
+
+      <Route path="/notifications" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <NotificationsPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
       
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" />} />
