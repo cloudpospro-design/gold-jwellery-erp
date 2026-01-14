@@ -68,6 +68,14 @@ function AppRoutes() {
           </DashboardLayout>
         </PrivateRoute>
       } />
+
+      <Route path="/analytics" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <AnalyticsDashboard />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
       
       <Route path="/users" element={
         <PrivateRoute>
