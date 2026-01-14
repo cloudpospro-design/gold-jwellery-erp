@@ -91,6 +91,15 @@ const InvoiceDetailPage = () => {
         <div className="flex gap-2">
           <Button
             variant="outline"
+            onClick={handleSendEmail}
+            className="border-[#E7E5E4]"
+            data-testid="email-invoice-button"
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Email to Customer
+          </Button>
+          <Button
+            variant="outline"
             onClick={handlePrint}
             className="border-[#E7E5E4]"
             data-testid="print-invoice-button"
