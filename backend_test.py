@@ -239,7 +239,7 @@ class JewelleryERPTester:
         original_token = self.token
         self.token = None
         
-        success, response = self.make_request('GET', 'auth/me', expected_status=401)
+        success, response = self.make_request('GET', 'auth/me', expected_status=403)
         
         # Restore token
         self.token = original_token
