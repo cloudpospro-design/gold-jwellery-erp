@@ -113,6 +113,7 @@ const DashboardLayout = ({ children }) => {
               {filteredMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
+                const isHighlight = item.highlight;
                 return (
                   <Link
                     key={item.path}
@@ -121,9 +122,11 @@ const DashboardLayout = ({ children }) => {
                     onClick={() => setSidebarOpen(false)}
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-200
-                      ${isActive 
-                        ? 'bg-[#FEFCE8] text-[#D4AF37] font-medium border border-[#D4AF37]/20' 
-                        : 'text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917]'
+                      ${isHighlight && !isActive
+                        ? 'bg-gradient-to-r from-[#1C1917] to-[#292524] text-[#D4AF37] font-medium'
+                        : isActive 
+                          ? 'bg-[#FEFCE8] text-[#D4AF37] font-medium border border-[#D4AF37]/20' 
+                          : 'text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917]'
                       }
                     `}
                   >
