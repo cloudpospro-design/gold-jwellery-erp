@@ -20,6 +20,12 @@ import NotificationsPage from './pages/NotificationsPage';
 import CustomersPage from './pages/CustomersPage';
 import CustomerDetailPage from './pages/CustomerDetailPage';
 import SettingsPage from './pages/SettingsPage';
+// Advanced Features
+import KarigarManagementPage from './pages/KarigarManagementPage';
+import KaratPricingPage from './pages/KaratPricingPage';
+import AdvancedGSTPage from './pages/AdvancedGSTPage';
+import BarcodeQRPage from './pages/BarcodeQRPage';
+import WhatsAppIntegrationPage from './pages/WhatsAppIntegrationPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
