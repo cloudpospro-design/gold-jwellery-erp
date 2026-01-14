@@ -152,6 +152,14 @@ function AppRoutes() {
         </PrivateRoute>
       } />
 
+      <Route path="/gold-rates" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <GoldRatesPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
       <Route path="/customers" element={
         <PrivateRoute>
           <DashboardLayout>
