@@ -1781,6 +1781,18 @@ class JewelleryERPTester:
         self.test_old_gold_exchange()
         self.test_get_old_gold_exchanges()
 
+        print("\n" + "=" * 60)
+        print("📊 Starting GST Reports Module Tests")
+        print("=" * 60)
+
+        # Test GST Reports
+        self.test_gstr1_report()
+        self.test_hsn_summary_report()
+        self.test_gstr3b_report()
+        self.test_itc_reconciliation_report()
+        self.test_gst_reports_date_validation()
+        self.test_gst_reports_permissions()
+
         # Print summary
         print("\n" + "=" * 60)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
