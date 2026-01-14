@@ -69,6 +69,31 @@ function AppRoutes() {
         </PrivateRoute>
       } />
 
+      {/* Inventory Routes */}
+      <Route path="/inventory" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <InventoryPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/inventory/add" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <ProductFormPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/inventory/edit/:id" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <ProductFormPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
       {/* Coming Soon Pages */}
       <Route path="/inventory" element={
         <PrivateRoute>
