@@ -666,11 +666,31 @@ class JewelleryERPTester:
         # Test login with invalid credentials
         self.test_login_invalid_credentials()
         
-        # Test protected endpoints
+        # Test protected endpoints - User Management
         self.test_get_current_user()
         self.test_get_users_list()
         self.test_toggle_user_status()
         self.test_unauthorized_access()
+
+        print("\n" + "=" * 60)
+        print("🏪 Starting Inventory Management Tests")
+        print("=" * 60)
+
+        # Test inventory management
+        self.test_create_categories()
+        self.test_get_categories()
+        created_product_success, created_product = self.test_create_product()
+        self.test_get_products_with_filters()
+        
+        if created_product:
+            self.test_get_single_product(created_product['id'])
+        else:
+            self.test_get_single_product()
+            
+        self.test_update_product()
+        self.test_update_stock()
+        self.test_low_stock_detection()
+        self.test_delete_product()
 
         # Print summary
         print("\n" + "=" * 60)
