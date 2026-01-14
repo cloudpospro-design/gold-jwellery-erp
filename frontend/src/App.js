@@ -8,6 +8,9 @@ import DashboardPage from './pages/DashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
 import InventoryPage from './pages/InventoryPage';
 import ProductFormPage from './pages/ProductFormPage';
+import SalesPage from './pages/SalesPage';
+import CreateSalePage from './pages/CreateSalePage';
+import InvoiceDetailPage from './pages/InvoiceDetailPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
