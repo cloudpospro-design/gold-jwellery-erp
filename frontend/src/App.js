@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
+import InventoryPage from './pages/InventoryPage';
+import ProductFormPage from './pages/ProductFormPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
