@@ -1021,6 +1021,19 @@ class JewelleryERPTester:
         self.test_low_stock_detection()
         self.test_delete_product()
 
+        print("\n" + "=" * 60)
+        print("💰 Starting Sales Module Tests")
+        print("=" * 60)
+
+        # Test sales management
+        self.test_create_customer()
+        self.test_get_customers()
+        self.test_create_sale_with_gst_calculation()
+        self.test_get_sales_with_filters()
+        self.test_get_single_sale()
+        self.test_sales_summary()
+        self.test_payment_method_tracking()
+
         # Print summary
         print("\n" + "=" * 60)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
