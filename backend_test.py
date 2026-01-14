@@ -971,6 +971,428 @@ class JewelleryERPTester:
         
         return all_methods_tested
 
+    # ===== PURCHASE MANAGEMENT TESTS =====
+    
+    def test_create_supplier(self):
+        """Test creating suppliers with full details"""
+        if not self.token:
+            self.log_test("Create Supplier", False, "No token available for authentication")
+            return False, None
+            
+        supplier_data = {
+            "name": f"Test Supplier {datetime.now().strftime('%H%M%S')}",
+            "contact_person": "John Doe",
+            "phone": "9876543210",
+            "email": f"supplier_{datetime.now().strftime('%H%M%S')}@test.com",
+            "gstin": "27ABCDE1234F1Z5",
+            "address": "123 Supplier Street, Business Area",
+            "city": "Mumbai",
+            "state": "Maharashtra",
+            "pincode": "400001",
+            "payment_terms": "Net 30"
+        }
+        
+        success, response = self.make_request('POST', 'purchase/suppliers', supplier_data, expected_status=201)
+        
+        if success:
+            # Verify all fields are present
+            required_fields = ['id', 'name', 'contact_person', 'phone', 'gstin', 'address', 'city', 'state', 'pincode', 'total_purchases']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                details = f"Supplier created but missing fields: {missing_fields}"
+                success = False
+            else:
+                details = f"Supplier created with all required fields"
+        else:
+            details = "Failed to create supplier"
+            
+        self.log_test(
+            "Create Supplier with Full Details",
+            success,
+            details,
+            {"supplier_id": response.get('id'), "has_all_fields": len(missing_fields) == 0 if success else False} if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_get_suppliers(self):
+        """Test getting all suppliers"""
+        if not self.token:
+            self.log_test("Get Suppliers", False, "No token available for authentication")
+            return False, []
+            
+        success, response = self.make_request('GET', 'purchase/suppliers', expected_status=200)
+        
+        if success:
+            supplier_count = len(response) if isinstance(response, list) else 0
+            details = f"Retrieved {supplier_count} suppliers"
+        else:
+            details = "Failed to retrieve suppliers"
+            
+        self.log_test(
+            "Get All Suppliers",
+            success,
+            details,
+            {"supplier_count": supplier_count} if success else response
+        )
+        return success, response if success else []
+
+    def test_update_supplier(self):
+        """Test updating supplier details"""
+        if not self.token:
+            self.log_test("Update Supplier", False, "No token available for authentication")
+            return False
+            
+        # Get suppliers to find one to update
+        suppliers_success, suppliers = self.test_get_suppliers()
+        if not suppliers_success or not suppliers:
+            # Create a supplier for testing
+            supplier_success, supplier = self.test_create_supplier()
+            if not supplier_success:
+                self.log_test("Update Supplier", False, "No suppliers available and failed to create test supplier")
+                return False
+            suppliers = [supplier]
+            
+        supplier_id = suppliers[0]['id']
+        original_name = suppliers[0]['name']
+        
+        # Update supplier data
+        update_data = {
+            "name": f"Updated {original_name}",
+            "payment_terms": "Net 45",
+            "phone": "9999888877"
+        }
+        
+        success, response = self.make_request('PATCH', f'purchase/suppliers/{supplier_id}', update_data, expected_status=200)
+        
+        if success:
+            # Verify updates were applied
+            name_updated = response.get('name') == update_data['name']
+            terms_updated = response.get('payment_terms') == update_data['payment_terms']
+            phone_updated = response.get('phone') == update_data['phone']
+            
+            all_updates_correct = name_updated and terms_updated and phone_updated
+            details = f"Supplier updated - Name: {name_updated}, Terms: {terms_updated}, Phone: {phone_updated}"
+        else:
+            all_updates_correct = False
+            details = f"Failed to update supplier {supplier_id}"
+            
+        self.log_test(
+            "Update Supplier Details",
+            success and all_updates_correct,
+            details,
+            {"supplier_id": supplier_id, "updates_applied": all_updates_correct} if success else response
+        )
+        
+        return success
+
+    def test_create_purchase_order(self):
+        """Test creating purchase order with items"""
+        if not self.token:
+            self.log_test("Create Purchase Order", False, "No token available for authentication")
+            return False, None
+            
+        # Ensure we have suppliers and products
+        suppliers_success, suppliers = self.test_get_suppliers()
+        if not suppliers_success or not suppliers:
+            # Create a supplier for testing
+            supplier_success, supplier = self.test_create_supplier()
+            if not supplier_success:
+                self.log_test("Create Purchase Order", False, "No suppliers available and failed to create test supplier")
+                return False, None
+            suppliers = [supplier]
+            
+        # Get products for PO
+        products_success, products = self.make_request('GET', 'inventory/products', expected_status=200)
+        if not products_success or not products:
+            self.log_test("Create Purchase Order", False, "No products available for purchase order")
+            return False, None
+            
+        product = products[0]
+        
+        # Create PO data
+        po_data = {
+            "supplier_id": suppliers[0]['id'],
+            "items": [
+                {
+                    "product_id": product['id'],
+                    "product_name": product['name'],
+                    "sku": product['sku'],
+                    "quantity": 5,
+                    "unit_price": product['base_price'],
+                    "hsn_code": product['hsn_code'],
+                    "gst_rate": product['gst_rate'],
+                    "total_before_tax": product['base_price'] * 5,
+                    "tax_amount": (product['selling_price'] - product['base_price']) * 5,
+                    "total_after_tax": product['selling_price'] * 5
+                }
+            ],
+            "expected_delivery": "2024-12-31",
+            "notes": "Test purchase order"
+        }
+        
+        success, response = self.make_request('POST', 'purchase/orders', po_data, expected_status=201)
+        
+        if success:
+            # Verify PO number format
+            po_number = response.get('po_number', '')
+            po_format_correct = po_number.startswith('PO-2024-') and len(po_number) == 14
+            
+            # Verify calculations
+            expected_subtotal = po_data['items'][0]['total_before_tax']
+            expected_gst = po_data['items'][0]['tax_amount']
+            expected_total = expected_subtotal + expected_gst
+            
+            subtotal_correct = abs(response.get('subtotal', 0) - expected_subtotal) < 0.01
+            gst_correct = abs(response.get('gst_total', 0) - expected_gst) < 0.01
+            total_correct = abs(response.get('grand_total', 0) - expected_total) < 0.01
+            
+            all_checks_passed = po_format_correct and subtotal_correct and gst_correct and total_correct
+            details = f"PO created - Number format: {po_format_correct}, Calculations: {subtotal_correct and gst_correct and total_correct}"
+        else:
+            all_checks_passed = False
+            details = "Failed to create purchase order"
+            
+        self.log_test(
+            "Create Purchase Order with Items",
+            success and all_checks_passed,
+            details,
+            {
+                "po_id": response.get('id'),
+                "po_number": response.get('po_number'),
+                "calculations_correct": all_checks_passed
+            } if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_get_purchase_orders(self):
+        """Test getting all purchase orders with status filter"""
+        if not self.token:
+            self.log_test("Get Purchase Orders", False, "No token available for authentication")
+            return False, []
+            
+        # Test getting all orders
+        success, all_orders = self.make_request('GET', 'purchase/orders', expected_status=200)
+        self.log_test(
+            "Get All Purchase Orders",
+            success,
+            f"Retrieved {len(all_orders)} purchase orders" if success else "Failed to get purchase orders",
+            {"orders_count": len(all_orders)} if success else all_orders
+        )
+        
+        if not success:
+            return False, []
+            
+        # Test status filter
+        success, pending_orders = self.make_request('GET', 'purchase/orders?status=pending', expected_status=200)
+        self.log_test(
+            "Get Purchase Orders by Status - Pending",
+            success,
+            f"Retrieved {len(pending_orders)} pending orders" if success else "Failed to filter by status",
+            {"pending_orders_count": len(pending_orders)} if success else pending_orders
+        )
+        
+        return True, all_orders
+
+    def test_get_single_purchase_order(self):
+        """Test getting single purchase order by ID"""
+        if not self.token:
+            self.log_test("Get Single Purchase Order", False, "No token available for authentication")
+            return False
+            
+        # Get orders list first
+        orders_success, orders = self.test_get_purchase_orders()
+        if not orders_success or not orders:
+            self.log_test("Get Single Purchase Order", False, "No purchase orders available to test single order retrieval")
+            return False
+            
+        po_id = orders[0]['id']
+        success, response = self.make_request('GET', f'purchase/orders/{po_id}', expected_status=200)
+        
+        if success:
+            # Verify all required fields are present
+            required_fields = ['id', 'po_number', 'supplier', 'items', 'subtotal', 'gst_total', 'grand_total', 'status']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                details = f"Purchase order retrieved but missing fields: {missing_fields}"
+                success = False
+            else:
+                details = f"Purchase order {po_id} retrieved with all required fields"
+        else:
+            details = f"Failed to retrieve purchase order {po_id}"
+            
+        self.log_test(
+            "Get Single Purchase Order by ID",
+            success,
+            details,
+            {"po_id": po_id, "has_all_fields": len(missing_fields) == 0 if success else False} if success else response
+        )
+        
+        return success
+
+    def test_receive_purchase_order(self):
+        """Test receiving purchase order and automatic stock update"""
+        if not self.token:
+            self.log_test("Receive Purchase Order", False, "No token available for authentication")
+            return False
+            
+        # Get pending orders
+        orders_success, orders = self.test_get_purchase_orders()
+        if not orders_success or not orders:
+            # Create a PO for testing
+            po_success, po = self.test_create_purchase_order()
+            if not po_success:
+                self.log_test("Receive Purchase Order", False, "No purchase orders available and failed to create test PO")
+                return False
+            orders = [po]
+            
+        # Find a pending order
+        pending_order = None
+        for order in orders:
+            if order.get('status') == 'pending':
+                pending_order = order
+                break
+                
+        if not pending_order:
+            self.log_test("Receive Purchase Order", False, "No pending orders available to test receipt")
+            return False
+            
+        po_id = pending_order['id']
+        
+        # Get product stock before receiving
+        if pending_order.get('items'):
+            product_id = pending_order['items'][0]['product_id']
+            product_success, product_before = self.make_request('GET', f'inventory/products/{product_id}', expected_status=200)
+            original_stock = product_before.get('quantity', 0) if product_success else 0
+        else:
+            original_stock = 0
+            product_id = None
+        
+        # Get supplier total purchases before
+        supplier_id = pending_order.get('supplier', {}).get('id') if isinstance(pending_order.get('supplier'), dict) else pending_order.get('supplier_id')
+        if supplier_id:
+            supplier_success, supplier_before = self.make_request('GET', f'purchase/suppliers/{supplier_id}', expected_status=200)
+            original_purchases = supplier_before.get('total_purchases', 0) if supplier_success else 0
+        else:
+            original_purchases = 0
+        
+        # Receive the order
+        success, response = self.make_request('PATCH', f'purchase/orders/{po_id}/receive', expected_status=200)
+        
+        if success:
+            # Verify status changed to received
+            status_updated = response.get('status') == 'received'
+            received_date_set = response.get('received_date') is not None
+            
+            # Verify stock was updated
+            stock_updated = False
+            if product_id:
+                product_success, product_after = self.make_request('GET', f'inventory/products/{product_id}', expected_status=200)
+                if product_success:
+                    new_stock = product_after.get('quantity', 0)
+                    expected_stock = original_stock + pending_order['items'][0]['quantity']
+                    stock_updated = new_stock == expected_stock
+            
+            # Verify supplier total purchases updated
+            purchases_updated = False
+            if supplier_id:
+                supplier_success, supplier_after = self.make_request('GET', f'purchase/suppliers/{supplier_id}', expected_status=200)
+                if supplier_success:
+                    new_purchases = supplier_after.get('total_purchases', 0)
+                    expected_purchases = original_purchases + pending_order['grand_total']
+                    purchases_updated = abs(new_purchases - expected_purchases) < 0.01
+            
+            all_updates_correct = status_updated and received_date_set and stock_updated and purchases_updated
+            details = f"PO received - Status: {status_updated}, Date: {received_date_set}, Stock: {stock_updated}, Purchases: {purchases_updated}"
+        else:
+            all_updates_correct = False
+            details = f"Failed to receive purchase order {po_id}"
+            
+        self.log_test(
+            "Receive Purchase Order & Auto Stock Update",
+            success and all_updates_correct,
+            details,
+            {
+                "po_id": po_id,
+                "status_updated": status_updated if success else False,
+                "stock_updated": stock_updated if success else False,
+                "purchases_updated": purchases_updated if success else False
+            } if success else response
+        )
+        
+        return success
+
+    def test_old_gold_exchange(self):
+        """Test recording old gold exchange"""
+        if not self.token:
+            self.log_test("Old Gold Exchange", False, "No token available for authentication")
+            return False, None
+            
+        exchange_data = {
+            "customer_name": f"Test Customer {datetime.now().strftime('%H%M%S')}",
+            "gold_weight": 10.5,
+            "purity": "22K",
+            "rate_per_gram": 5500.0,
+            "description": "Old gold necklace exchange"
+        }
+        
+        success, response = self.make_request('POST', 'purchase/old-gold', exchange_data, expected_status=201)
+        
+        if success:
+            # Verify total value calculation
+            expected_value = exchange_data['gold_weight'] * exchange_data['rate_per_gram']
+            actual_value = response.get('total_value', 0)
+            value_correct = abs(actual_value - expected_value) < 0.01
+            
+            # Verify all fields are present
+            required_fields = ['id', 'customer_name', 'gold_weight', 'purity', 'rate_per_gram', 'total_value', 'exchange_date']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            all_checks_passed = value_correct and len(missing_fields) == 0
+            details = f"Exchange recorded - Value calculation: {value_correct}, All fields: {len(missing_fields) == 0}"
+        else:
+            all_checks_passed = False
+            details = "Failed to record old gold exchange"
+            
+        self.log_test(
+            "Record Old Gold Exchange",
+            success and all_checks_passed,
+            details,
+            {
+                "exchange_id": response.get('id'),
+                "total_value": response.get('total_value'),
+                "calculation_correct": value_correct if success else False
+            } if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_get_old_gold_exchanges(self):
+        """Test getting all old gold exchanges"""
+        if not self.token:
+            self.log_test("Get Old Gold Exchanges", False, "No token available for authentication")
+            return False
+            
+        success, response = self.make_request('GET', 'purchase/old-gold', expected_status=200)
+        
+        if success:
+            exchange_count = len(response) if isinstance(response, list) else 0
+            details = f"Retrieved {exchange_count} old gold exchanges"
+        else:
+            details = "Failed to retrieve old gold exchanges"
+            
+        self.log_test(
+            "Get All Old Gold Exchanges",
+            success,
+            details,
+            {"exchange_count": exchange_count} if success else response
+        )
+        
+        return success
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Gold Jewellery ERP Backend API Tests")
