@@ -19,7 +19,8 @@ import {
   Calculator,
   QrCode,
   MessageCircle,
-  Hammer
+  Hammer,
+  Crown
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
@@ -34,7 +35,11 @@ const DashboardLayout = ({ children }) => {
     navigate('/login');
   };
 
+  const isSuperAdmin = user?.role === 'superadmin';
+
   const menuItems = [
+    // SuperAdmin link - only visible to superadmin
+    ...(isSuperAdmin ? [{ icon: Crown, label: 'SuperAdmin Panel', path: '/superadmin', permission: null, highlight: true }] : []),
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', permission: null },
     { icon: TrendingUp, label: 'Analytics', path: '/analytics', permission: null },
     { icon: Users, label: 'User Management', path: '/users', permission: 'users_read' },
