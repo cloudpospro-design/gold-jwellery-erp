@@ -128,11 +128,20 @@ function AppRoutes() {
       <Route path="/purchase" element={
         <PrivateRoute>
           <DashboardLayout>
-            <ComingSoon title="Purchase Management" />
+            <PurchasePage />
           </DashboardLayout>
         </PrivateRoute>
       } />
 
+      <Route path="/purchase/suppliers" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <SuppliersPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      {/* Coming Soon Pages */}
       <Route path="/customers" element={
         <PrivateRoute>
           <DashboardLayout>
