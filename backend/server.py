@@ -21,11 +21,12 @@ app = FastAPI(title="Gold Jewellery ERP API", version="1.0.0")
 api_router = APIRouter(prefix="/api")
 
 # Import and include routers
-from routes import auth_routes, user_routes, inventory_routes
+from routes import auth_routes, user_routes, inventory_routes, sales_routes
 
 api_router.include_router(auth_routes.router)
 api_router.include_router(user_routes.router)
 api_router.include_router(inventory_routes.router)
+api_router.include_router(sales_routes.router)
 
 @api_router.get("/")
 async def root():
