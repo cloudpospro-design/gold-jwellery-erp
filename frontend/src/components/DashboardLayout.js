@@ -39,6 +39,7 @@ const DashboardLayout = ({ children }) => {
     { icon: UserCircle, label: 'Customers', path: '/customers', permission: 'customer_read' },
     { icon: FileText, label: 'GST Reports', path: '/gst-reports', permission: 'reports_read' },
     { icon: TrendingUp, label: 'Gold Rates', path: '/gold-rates', permission: 'inventory_read' },
+    { icon: Bell, label: 'Notifications', path: '/notifications', permission: 'sales_all' },
     { icon: Settings, label: 'Settings', path: '/settings', permission: null },
   ];
 
