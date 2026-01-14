@@ -95,14 +95,6 @@ function AppRoutes() {
       } />
 
       {/* Coming Soon Pages */}
-      <Route path="/inventory" element={
-        <PrivateRoute>
-          <DashboardLayout>
-            <ComingSoon title="Inventory Management" />
-          </DashboardLayout>
-        </PrivateRoute>
-      } />
-
       <Route path="/sales" element={
         <PrivateRoute>
           <DashboardLayout>
