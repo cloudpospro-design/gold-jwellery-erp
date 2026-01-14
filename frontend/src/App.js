@@ -11,6 +11,8 @@ import ProductFormPage from './pages/ProductFormPage';
 import SalesPage from './pages/SalesPage';
 import CreateSalePage from './pages/CreateSalePage';
 import InvoiceDetailPage from './pages/InvoiceDetailPage';
+import PurchasePage from './pages/PurchasePage';
+import SuppliersPage from './pages/SuppliersPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
