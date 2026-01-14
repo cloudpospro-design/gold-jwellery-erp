@@ -175,7 +175,15 @@ function AppRoutes() {
       <Route path="/customers" element={
         <PrivateRoute>
           <DashboardLayout>
-            <ComingSoon title="Customer Management" />
+            <CustomersPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/customers/:id" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <CustomerDetailPage />
           </DashboardLayout>
         </PrivateRoute>
       } />
