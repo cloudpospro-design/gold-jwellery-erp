@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 
 class JewelleryERPTester:
-    def __init__(self, base_url="https://jewellerp-gst.preview.emergentagent.com"):
+    def __init__(self, base_url="https://goldtracker-app-2.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None

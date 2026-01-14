@@ -12,7 +12,7 @@
       {
         "component": "SalesPage - API Data Loading",
         "issue": "Mixed Content security error: HTTPS page making HTTP API requests",
-        "error_message": "Mixed Content: The page at 'https://jewellerp-gst.preview.emergentagent.com/sales' was loaded over HTTPS, but requested an insecure XMLHttpRequest endpoint 'http://jewellerp-gst.preview.emergentagent.com/api/sales/'",
+        "error_message": "Mixed Content: The page at 'https://goldtracker-app-2.preview.emergentagent.com/sales' was loaded over HTTPS, but requested an insecure XMLHttpRequest endpoint 'http://jewellerp-gst.preview.emergentagent.com/api/sales/'",
         "impact": "Sales summary cards not loading, sales list not displaying",
         "affected_selectors": ["text=Total Sales", "text=Total Revenue", "[data-testid^=\"sale-card-\"]"],
         "fix_priority": "CRITICAL"

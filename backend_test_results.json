@@ -9,7 +9,7 @@
     {
       "test_name": "API Health Check",
       "success": true,
-      "details": "API endpoint accessible at https://jewellerp-gst.preview.emergentagent.com/api",
+      "details": "API endpoint accessible at https://goldtracker-app-2.preview.emergentagent.com/api",
       "response_data": {
         "message": "Gold Jewellery ERP API",
         "version": "1.0.0"
