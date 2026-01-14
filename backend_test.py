@@ -253,6 +253,395 @@ class JewelleryERPTester:
             response
         )
 
+    # ===== INVENTORY MANAGEMENT TESTS =====
+    
+    def test_create_categories(self):
+        """Test creating product categories"""
+        if not self.token:
+            self.log_test("Create Categories", False, "No token available for authentication")
+            return False
+            
+        categories = [
+            {"name": "Necklace", "description": "Traditional and modern necklaces", "hsn_code": "71131900"},
+            {"name": "Ring", "description": "Wedding and engagement rings", "hsn_code": "71131900"},
+            {"name": "Bangle", "description": "Gold bangles and bracelets", "hsn_code": "71131900"},
+            {"name": "Earring", "description": "Stud and drop earrings", "hsn_code": "71131900"}
+        ]
+        
+        created_categories = []
+        for category in categories:
+            success, response = self.make_request('POST', 'inventory/categories', category, expected_status=201)
+            self.log_test(
+                f"Create Category - {category['name']}",
+                success,
+                f"Created {category['name']} category" if success else f"Failed to create {category['name']} category",
+                {"category_id": response.get('id')} if success else response
+            )
+            if success:
+                created_categories.append(response)
+        
+        return created_categories
+
+    def test_get_categories(self):
+        """Test getting all categories"""
+        if not self.token:
+            self.log_test("Get Categories", False, "No token available for authentication")
+            return False, []
+            
+        success, response = self.make_request('GET', 'inventory/categories', expected_status=200)
+        
+        if success:
+            category_count = len(response) if isinstance(response, list) else 0
+            details = f"Retrieved {category_count} categories"
+        else:
+            details = "Failed to retrieve categories"
+            
+        self.log_test(
+            "Get All Categories",
+            success,
+            details,
+            {"category_count": category_count} if success else response
+        )
+        return success, response if success else []
+
+    def test_create_product(self):
+        """Test creating a product with jewellery attributes"""
+        if not self.token:
+            self.log_test("Create Product", False, "No token available for authentication")
+            return False, None
+            
+        # First ensure we have categories
+        categories_success, categories = self.test_get_categories()
+        if not categories_success or not categories:
+            self.log_test("Create Product", False, "No categories available for product creation")
+            return False, None
+            
+        # Create a test product
+        product_data = {
+            "name": "Gold Wedding Ring",
+            "sku": f"GWR-{datetime.now().strftime('%H%M%S')}",
+            "description": "Beautiful 22K gold wedding ring with intricate design",
+            "category": categories[0]['name'] if categories else "Ring",
+            "gold_weight": 5.5,
+            "purity": "22K",
+            "making_charges": 2500.0,
+            "stone_weight": 0.25,
+            "stone_charges": 1500.0,
+            "hallmark_number": "BIS-HM-001",
+            "hsn_code": "71131900",
+            "base_price": 35000.0,
+            "gst_rate": 3.0,
+            "quantity": 10,
+            "low_stock_threshold": 3,
+            "images": []
+        }
+        
+        success, response = self.make_request('POST', 'inventory/products', product_data, expected_status=201)
+        
+        # Verify selling price calculation
+        if success:
+            expected_selling_price = round(product_data['base_price'] * (1 + product_data['gst_rate'] / 100), 2)
+            actual_selling_price = response.get('selling_price', 0)
+            price_correct = abs(expected_selling_price - actual_selling_price) < 0.01
+            
+            details = f"Product created with selling price ₹{actual_selling_price} (expected ₹{expected_selling_price})"
+            if not price_correct:
+                details += " - PRICE CALCULATION ERROR"
+        else:
+            details = "Failed to create product"
+            price_correct = False
+            
+        self.log_test(
+            "Create Product with Jewellery Attributes",
+            success and price_correct,
+            details,
+            {"product_id": response.get('id'), "selling_price": response.get('selling_price')} if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_get_products_with_filters(self):
+        """Test getting products with various filters"""
+        if not self.token:
+            self.log_test("Get Products with Filters", False, "No token available for authentication")
+            return False
+            
+        # Test getting all products
+        success, all_products = self.make_request('GET', 'inventory/products', expected_status=200)
+        self.log_test(
+            "Get All Products",
+            success,
+            f"Retrieved {len(all_products)} products" if success else "Failed to get products",
+            {"product_count": len(all_products)} if success else all_products
+        )
+        
+        if not success or not all_products:
+            return False
+            
+        # Test category filter
+        first_product_category = all_products[0].get('category')
+        if first_product_category:
+            success, filtered_products = self.make_request('GET', f'inventory/products?category={first_product_category}', expected_status=200)
+            self.log_test(
+                f"Get Products by Category - {first_product_category}",
+                success,
+                f"Retrieved {len(filtered_products)} products for category {first_product_category}" if success else "Failed to filter by category",
+                {"filtered_count": len(filtered_products)} if success else filtered_products
+            )
+        
+        # Test low stock filter
+        success, low_stock_products = self.make_request('GET', 'inventory/products?low_stock=true', expected_status=200)
+        self.log_test(
+            "Get Low Stock Products",
+            success,
+            f"Retrieved {len(low_stock_products)} low stock products" if success else "Failed to get low stock products",
+            {"low_stock_count": len(low_stock_products)} if success else low_stock_products
+        )
+        
+        # Test search filter
+        if all_products:
+            search_term = all_products[0]['name'][:5]  # First 5 characters of product name
+            success, search_results = self.make_request('GET', f'inventory/products?search={search_term}', expected_status=200)
+            self.log_test(
+                f"Search Products - '{search_term}'",
+                success,
+                f"Found {len(search_results)} products matching '{search_term}'" if success else "Failed to search products",
+                {"search_results": len(search_results)} if success else search_results
+            )
+        
+        return True
+
+    def test_get_single_product(self, product_id=None):
+        """Test getting a single product by ID"""
+        if not self.token:
+            self.log_test("Get Single Product", False, "No token available for authentication")
+            return False
+            
+        # If no product_id provided, get one from products list
+        if not product_id:
+            success, products = self.make_request('GET', 'inventory/products', expected_status=200)
+            if not success or not products:
+                self.log_test("Get Single Product", False, "No products available to test single product retrieval")
+                return False
+            product_id = products[0]['id']
+        
+        success, response = self.make_request('GET', f'inventory/products/{product_id}', expected_status=200)
+        
+        if success:
+            # Verify all required fields are present
+            required_fields = ['id', 'name', 'sku', 'category', 'gold_weight', 'purity', 'selling_price', 'quantity']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                details = f"Product retrieved but missing fields: {missing_fields}"
+                success = False
+            else:
+                details = f"Product {product_id} retrieved with all required fields"
+        else:
+            details = f"Failed to retrieve product {product_id}"
+            
+        self.log_test(
+            "Get Single Product by ID",
+            success,
+            details,
+            {"product_id": product_id, "has_all_fields": len(missing_fields) == 0 if success else False} if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_update_product(self):
+        """Test updating product details"""
+        if not self.token:
+            self.log_test("Update Product", False, "No token available for authentication")
+            return False
+            
+        # Get a product to update
+        success, products = self.make_request('GET', 'inventory/products', expected_status=200)
+        if not success or not products:
+            self.log_test("Update Product", False, "No products available to test update")
+            return False
+            
+        product_id = products[0]['id']
+        original_name = products[0]['name']
+        
+        # Update product data
+        update_data = {
+            "name": f"Updated {original_name}",
+            "making_charges": 3000.0,
+            "base_price": 40000.0
+        }
+        
+        success, response = self.make_request('PATCH', f'inventory/products/{product_id}', update_data, expected_status=200)
+        
+        if success:
+            # Verify updates were applied
+            name_updated = response.get('name') == update_data['name']
+            charges_updated = response.get('making_charges') == update_data['making_charges']
+            price_updated = response.get('base_price') == update_data['base_price']
+            
+            # Verify selling price was recalculated
+            expected_selling_price = round(update_data['base_price'] * (1 + response.get('gst_rate', 3) / 100), 2)
+            actual_selling_price = response.get('selling_price', 0)
+            price_recalculated = abs(expected_selling_price - actual_selling_price) < 0.01
+            
+            all_updates_correct = name_updated and charges_updated and price_updated and price_recalculated
+            details = f"Product updated - Name: {name_updated}, Charges: {charges_updated}, Price: {price_updated}, Recalculated: {price_recalculated}"
+        else:
+            all_updates_correct = False
+            details = f"Failed to update product {product_id}"
+            
+        self.log_test(
+            "Update Product Details",
+            success and all_updates_correct,
+            details,
+            {"product_id": product_id, "updates_applied": all_updates_correct} if success else response
+        )
+        
+        return success
+
+    def test_update_stock(self):
+        """Test updating product stock"""
+        if not self.token:
+            self.log_test("Update Stock", False, "No token available for authentication")
+            return False
+            
+        # Get a product to update stock
+        success, products = self.make_request('GET', 'inventory/products', expected_status=200)
+        if not success or not products:
+            self.log_test("Update Stock", False, "No products available to test stock update")
+            return False
+            
+        product_id = products[0]['id']
+        original_quantity = products[0]['quantity']
+        
+        # Test stock increase
+        stock_update = {
+            "quantity_change": 5,
+            "reason": "Stock replenishment test"
+        }
+        
+        success, response = self.make_request('PATCH', f'inventory/products/{product_id}/stock', stock_update, expected_status=200)
+        
+        if success:
+            expected_quantity = original_quantity + stock_update['quantity_change']
+            actual_quantity = response.get('quantity', 0)
+            quantity_correct = actual_quantity == expected_quantity
+            
+            # Check if low stock status is updated correctly
+            low_stock_threshold = response.get('low_stock_threshold', 5)
+            expected_low_stock = actual_quantity <= low_stock_threshold
+            actual_low_stock = response.get('is_low_stock', False)
+            low_stock_correct = expected_low_stock == actual_low_stock
+            
+            details = f"Stock updated from {original_quantity} to {actual_quantity} (expected {expected_quantity}), Low stock: {actual_low_stock}"
+            stock_update_correct = quantity_correct and low_stock_correct
+        else:
+            stock_update_correct = False
+            details = f"Failed to update stock for product {product_id}"
+            
+        self.log_test(
+            "Update Product Stock",
+            success and stock_update_correct,
+            details,
+            {"product_id": product_id, "stock_correct": stock_update_correct} if success else response
+        )
+        
+        return success
+
+    def test_delete_product(self):
+        """Test deleting a product"""
+        if not self.token:
+            self.log_test("Delete Product", False, "No token available for authentication")
+            return False
+            
+        # Create a product specifically for deletion test
+        test_product = {
+            "name": "Test Product for Deletion",
+            "sku": f"DEL-TEST-{datetime.now().strftime('%H%M%S')}",
+            "description": "This product will be deleted",
+            "category": "Ring",
+            "gold_weight": 2.0,
+            "purity": "18K",
+            "making_charges": 1000.0,
+            "base_price": 15000.0,
+            "gst_rate": 3.0,
+            "quantity": 1,
+            "low_stock_threshold": 1
+        }
+        
+        # Create the product
+        create_success, created_product = self.make_request('POST', 'inventory/products', test_product, expected_status=201)
+        if not create_success:
+            self.log_test("Delete Product", False, "Failed to create test product for deletion")
+            return False
+            
+        product_id = created_product['id']
+        
+        # Delete the product
+        success, response = self.make_request('DELETE', f'inventory/products/{product_id}', expected_status=204)
+        
+        if success:
+            # Verify product is actually deleted by trying to get it
+            get_success, get_response = self.make_request('GET', f'inventory/products/{product_id}', expected_status=404)
+            deletion_verified = get_success  # 404 is expected, so success means it's properly deleted
+            details = "Product deleted and verified as removed" if deletion_verified else "Product deleted but still accessible"
+        else:
+            deletion_verified = False
+            details = f"Failed to delete product {product_id}"
+            
+        self.log_test(
+            "Delete Product",
+            success and deletion_verified,
+            details,
+            {"product_id": product_id, "deletion_verified": deletion_verified} if success else response
+        )
+        
+        return success
+
+    def test_low_stock_detection(self):
+        """Test low stock detection functionality"""
+        if not self.token:
+            self.log_test("Low Stock Detection", False, "No token available for authentication")
+            return False
+            
+        # Create a product with low stock
+        low_stock_product = {
+            "name": "Low Stock Test Product",
+            "sku": f"LOW-STOCK-{datetime.now().strftime('%H%M%S')}",
+            "description": "Product for testing low stock detection",
+            "category": "Ring",
+            "gold_weight": 1.5,
+            "purity": "22K",
+            "making_charges": 800.0,
+            "base_price": 12000.0,
+            "gst_rate": 3.0,
+            "quantity": 2,  # Below threshold
+            "low_stock_threshold": 5
+        }
+        
+        success, response = self.make_request('POST', 'inventory/products', low_stock_product, expected_status=201)
+        
+        if success:
+            is_low_stock = response.get('is_low_stock', False)
+            quantity = response.get('quantity', 0)
+            threshold = response.get('low_stock_threshold', 0)
+            
+            # Should be marked as low stock since quantity (2) <= threshold (5)
+            low_stock_correct = is_low_stock and quantity <= threshold
+            details = f"Product created with quantity {quantity}, threshold {threshold}, marked as low stock: {is_low_stock}"
+        else:
+            low_stock_correct = False
+            details = "Failed to create low stock test product"
+            
+        self.log_test(
+            "Low Stock Detection",
+            success and low_stock_correct,
+            details,
+            {"quantity": response.get('quantity'), "threshold": response.get('low_stock_threshold'), "is_low_stock": response.get('is_low_stock')} if success else response
+        )
+        
+        return success
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Gold Jewellery ERP Backend API Tests")
