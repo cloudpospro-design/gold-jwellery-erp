@@ -72,6 +72,13 @@ function AppRoutes() {
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       
+      {/* SuperAdmin Route */}
+      <Route path="/superadmin" element={
+        <PrivateRoute>
+          <SuperAdminDashboard />
+        </PrivateRoute>
+      } />
+      
       {/* Private Routes */}
       <Route path="/dashboard" element={
         <PrivateRoute>
