@@ -1393,6 +1393,316 @@ class JewelleryERPTester:
         
         return success
 
+    # ===== GST REPORTS MODULE TESTS =====
+    
+    def test_gstr1_report(self):
+        """Test GSTR-1 report generation with B2B and B2C breakdown"""
+        if not self.token:
+            self.log_test("GSTR-1 Report", False, "No token available for authentication")
+            return False
+            
+        # Test with date range
+        from_date = "2024-01-01"
+        to_date = "2024-12-31"
+        
+        success, response = self.make_request('GET', f'gst-reports/gstr1?from_date={from_date}&to_date={to_date}', expected_status=200)
+        
+        if success:
+            # Verify required fields are present
+            required_fields = ['period_from', 'period_to', 'b2b_invoices', 'b2c_invoices', 'total_taxable_value', 'total_cgst', 'total_sgst', 'total_igst', 'total_tax', 'total_invoice_value']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            # Verify date range matches
+            date_range_correct = response.get('period_from') == from_date and response.get('period_to') == to_date
+            
+            # Verify B2B invoices have GSTIN
+            b2b_valid = True
+            for invoice in response.get('b2b_invoices', []):
+                if not invoice.get('customer_gstin'):
+                    b2b_valid = False
+                    break
+            
+            # Verify B2C invoices don't have GSTIN requirement (they may or may not have it)
+            b2c_structure_valid = all('invoice_number' in inv and 'customer_state' in inv for inv in response.get('b2c_invoices', []))
+            
+            # Verify totals calculation
+            calculated_total_tax = response.get('total_cgst', 0) + response.get('total_sgst', 0) + response.get('total_igst', 0)
+            totals_correct = abs(calculated_total_tax - response.get('total_tax', 0)) < 0.01
+            
+            all_checks_passed = (len(missing_fields) == 0 and date_range_correct and 
+                               b2b_valid and b2c_structure_valid and totals_correct)
+            
+            details = f"GSTR-1 generated - Fields: {len(missing_fields) == 0}, Dates: {date_range_correct}, B2B: {b2b_valid}, B2C: {b2c_structure_valid}, Totals: {totals_correct}"
+        else:
+            all_checks_passed = False
+            details = "Failed to generate GSTR-1 report"
+            
+        self.log_test(
+            "Generate GSTR-1 Report with B2B/B2C Breakdown",
+            success and all_checks_passed,
+            details,
+            {
+                "b2b_count": len(response.get('b2b_invoices', [])),
+                "b2c_count": len(response.get('b2c_invoices', [])),
+                "total_taxable_value": response.get('total_taxable_value'),
+                "total_tax": response.get('total_tax')
+            } if success else response
+        )
+        
+        return success and all_checks_passed
+
+    def test_hsn_summary_report(self):
+        """Test HSN-wise summary report generation"""
+        if not self.token:
+            self.log_test("HSN Summary Report", False, "No token available for authentication")
+            return False
+            
+        from_date = "2024-01-01"
+        to_date = "2024-12-31"
+        
+        success, response = self.make_request('GET', f'gst-reports/hsn-summary?from_date={from_date}&to_date={to_date}', expected_status=200)
+        
+        if success:
+            # Verify required fields
+            required_fields = ['period_from', 'period_to', 'items', 'total_taxable_value', 'total_tax']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            # Verify HSN items structure
+            hsn_items_valid = True
+            for item in response.get('items', []):
+                required_item_fields = ['hsn_code', 'description', 'total_quantity', 'total_value', 'taxable_value', 'cgst', 'sgst', 'igst', 'total_tax']
+                if not all(field in item for field in required_item_fields):
+                    hsn_items_valid = False
+                    break
+                    
+                # Verify tax calculation for each item
+                calculated_tax = item.get('cgst', 0) + item.get('sgst', 0) + item.get('igst', 0)
+                if abs(calculated_tax - item.get('total_tax', 0)) > 0.01:
+                    hsn_items_valid = False
+                    break
+            
+            # Verify aggregated totals
+            calculated_total_taxable = sum(item.get('taxable_value', 0) for item in response.get('items', []))
+            calculated_total_tax = sum(item.get('total_tax', 0) for item in response.get('items', []))
+            
+            totals_match = (abs(calculated_total_taxable - response.get('total_taxable_value', 0)) < 0.01 and
+                           abs(calculated_total_tax - response.get('total_tax', 0)) < 0.01)
+            
+            all_checks_passed = (len(missing_fields) == 0 and hsn_items_valid and totals_match)
+            details = f"HSN Summary generated - Fields: {len(missing_fields) == 0}, Items: {hsn_items_valid}, Totals: {totals_match}"
+        else:
+            all_checks_passed = False
+            details = "Failed to generate HSN summary report"
+            
+        self.log_test(
+            "Generate HSN-wise Summary Report",
+            success and all_checks_passed,
+            details,
+            {
+                "hsn_items_count": len(response.get('items', [])),
+                "total_taxable_value": response.get('total_taxable_value'),
+                "total_tax": response.get('total_tax')
+            } if success else response
+        )
+        
+        return success and all_checks_passed
+
+    def test_gstr3b_report(self):
+        """Test GSTR-3B monthly summary report generation"""
+        if not self.token:
+            self.log_test("GSTR-3B Report", False, "No token available for authentication")
+            return False
+            
+        from_date = "2024-01-01"
+        to_date = "2024-12-31"
+        
+        success, response = self.make_request('GET', f'gst-reports/gstr3b?from_date={from_date}&to_date={to_date}', expected_status=200)
+        
+        if success:
+            # Verify required fields
+            required_fields = [
+                'period_from', 'period_to',
+                'outward_taxable_supplies', 'outward_tax_amount', 'outward_cgst', 'outward_sgst', 'outward_igst',
+                'inward_taxable_supplies', 'inward_tax_amount', 'itc_cgst', 'itc_sgst', 'itc_igst',
+                'net_cgst', 'net_sgst', 'net_igst', 'net_tax_payable'
+            ]
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            # Verify outward supplies calculation
+            calculated_outward_tax = (response.get('outward_cgst', 0) + 
+                                    response.get('outward_sgst', 0) + 
+                                    response.get('outward_igst', 0))
+            outward_calc_correct = abs(calculated_outward_tax - response.get('outward_tax_amount', 0)) < 0.01
+            
+            # Verify inward supplies (ITC) calculation
+            calculated_itc_total = (response.get('itc_cgst', 0) + 
+                                  response.get('itc_sgst', 0) + 
+                                  response.get('itc_igst', 0))
+            itc_calc_correct = abs(calculated_itc_total - response.get('inward_tax_amount', 0)) < 0.01
+            
+            # Verify net tax liability calculation
+            expected_net_cgst = max(0, response.get('outward_cgst', 0) - response.get('itc_cgst', 0))
+            expected_net_sgst = max(0, response.get('outward_sgst', 0) - response.get('itc_sgst', 0))
+            expected_net_igst = max(0, response.get('outward_igst', 0) - response.get('itc_igst', 0))
+            expected_net_total = expected_net_cgst + expected_net_sgst + expected_net_igst
+            
+            net_calc_correct = (abs(expected_net_cgst - response.get('net_cgst', 0)) < 0.01 and
+                              abs(expected_net_sgst - response.get('net_sgst', 0)) < 0.01 and
+                              abs(expected_net_igst - response.get('net_igst', 0)) < 0.01 and
+                              abs(expected_net_total - response.get('net_tax_payable', 0)) < 0.01)
+            
+            all_checks_passed = (len(missing_fields) == 0 and outward_calc_correct and 
+                               itc_calc_correct and net_calc_correct)
+            
+            details = f"GSTR-3B generated - Fields: {len(missing_fields) == 0}, Outward: {outward_calc_correct}, ITC: {itc_calc_correct}, Net: {net_calc_correct}"
+        else:
+            all_checks_passed = False
+            details = "Failed to generate GSTR-3B report"
+            
+        self.log_test(
+            "Generate GSTR-3B Monthly Summary Report",
+            success and all_checks_passed,
+            details,
+            {
+                "outward_tax_amount": response.get('outward_tax_amount'),
+                "inward_tax_amount": response.get('inward_tax_amount'),
+                "net_tax_payable": response.get('net_tax_payable')
+            } if success else response
+        )
+        
+        return success and all_checks_passed
+
+    def test_itc_reconciliation_report(self):
+        """Test ITC reconciliation report generation"""
+        if not self.token:
+            self.log_test("ITC Reconciliation Report", False, "No token available for authentication")
+            return False
+            
+        from_date = "2024-01-01"
+        to_date = "2024-12-31"
+        
+        success, response = self.make_request('GET', f'gst-reports/itc-reconciliation?from_date={from_date}&to_date={to_date}', expected_status=200)
+        
+        if success:
+            # Verify required fields
+            required_fields = [
+                'period_from', 'period_to',
+                'itc_available_cgst', 'itc_available_sgst', 'itc_available_igst', 'total_itc_available',
+                'output_cgst', 'output_sgst', 'output_igst', 'total_output_tax',
+                'net_cgst', 'net_sgst', 'net_igst', 'net_tax_payable',
+                'total_purchases', 'total_sales'
+            ]
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            # Verify ITC total calculation
+            calculated_itc_total = (response.get('itc_available_cgst', 0) + 
+                                  response.get('itc_available_sgst', 0) + 
+                                  response.get('itc_available_igst', 0))
+            itc_total_correct = abs(calculated_itc_total - response.get('total_itc_available', 0)) < 0.01
+            
+            # Verify output tax total calculation
+            calculated_output_total = (response.get('output_cgst', 0) + 
+                                     response.get('output_sgst', 0) + 
+                                     response.get('output_igst', 0))
+            output_total_correct = abs(calculated_output_total - response.get('total_output_tax', 0)) < 0.01
+            
+            # Verify net tax calculation
+            expected_net_total = (response.get('net_cgst', 0) + 
+                                response.get('net_sgst', 0) + 
+                                response.get('net_igst', 0))
+            net_total_correct = abs(expected_net_total - response.get('net_tax_payable', 0)) < 0.01
+            
+            # Verify purchase and sales totals are present and non-negative
+            totals_valid = (response.get('total_purchases', 0) >= 0 and 
+                          response.get('total_sales', 0) >= 0)
+            
+            all_checks_passed = (len(missing_fields) == 0 and itc_total_correct and 
+                               output_total_correct and net_total_correct and totals_valid)
+            
+            details = f"ITC Reconciliation generated - Fields: {len(missing_fields) == 0}, ITC: {itc_total_correct}, Output: {output_total_correct}, Net: {net_total_correct}, Totals: {totals_valid}"
+        else:
+            all_checks_passed = False
+            details = "Failed to generate ITC reconciliation report"
+            
+        self.log_test(
+            "Generate ITC Reconciliation Report",
+            success and all_checks_passed,
+            details,
+            {
+                "total_itc_available": response.get('total_itc_available'),
+                "total_output_tax": response.get('total_output_tax'),
+                "net_tax_payable": response.get('net_tax_payable'),
+                "total_purchases": response.get('total_purchases'),
+                "total_sales": response.get('total_sales')
+            } if success else response
+        )
+        
+        return success and all_checks_passed
+
+    def test_gst_reports_date_validation(self):
+        """Test GST reports with invalid date ranges"""
+        if not self.token:
+            self.log_test("GST Reports Date Validation", False, "No token available for authentication")
+            return False
+            
+        # Test missing date parameters
+        success, response = self.make_request('GET', 'gst-reports/gstr1', expected_status=422)
+        missing_params_handled = success
+        
+        # Test invalid date format
+        success, response = self.make_request('GET', 'gst-reports/gstr1?from_date=invalid&to_date=2024-12-31', expected_status=422)
+        invalid_format_handled = success
+        
+        # Test future dates (should work but return empty results)
+        success, response = self.make_request('GET', 'gst-reports/gstr1?from_date=2025-01-01&to_date=2025-12-31', expected_status=200)
+        future_dates_handled = success
+        
+        all_validations_passed = missing_params_handled and invalid_format_handled and future_dates_handled
+        
+        self.log_test(
+            "GST Reports Date Range Validation",
+            all_validations_passed,
+            f"Date validation - Missing params: {missing_params_handled}, Invalid format: {invalid_format_handled}, Future dates: {future_dates_handled}",
+            {
+                "missing_params_handled": missing_params_handled,
+                "invalid_format_handled": invalid_format_handled,
+                "future_dates_handled": future_dates_handled
+            }
+        )
+        
+        return all_validations_passed
+
+    def test_gst_reports_permissions(self):
+        """Test GST reports access with different permission levels"""
+        if not self.token:
+            self.log_test("GST Reports Permissions", False, "No token available for authentication")
+            return False
+            
+        # Test with admin user (should have access)
+        from_date = "2024-01-01"
+        to_date = "2024-12-31"
+        
+        gstr1_success, _ = self.make_request('GET', f'gst-reports/gstr1?from_date={from_date}&to_date={to_date}', expected_status=200)
+        hsn_success, _ = self.make_request('GET', f'gst-reports/hsn-summary?from_date={from_date}&to_date={to_date}', expected_status=200)
+        gstr3b_success, _ = self.make_request('GET', f'gst-reports/gstr3b?from_date={from_date}&to_date={to_date}', expected_status=200)
+        itc_success, _ = self.make_request('GET', f'gst-reports/itc-reconciliation?from_date={from_date}&to_date={to_date}', expected_status=200)
+        
+        all_reports_accessible = gstr1_success and hsn_success and gstr3b_success and itc_success
+        
+        self.log_test(
+            "GST Reports Permission Access",
+            all_reports_accessible,
+            f"Report access - GSTR-1: {gstr1_success}, HSN: {hsn_success}, GSTR-3B: {gstr3b_success}, ITC: {itc_success}",
+            {
+                "gstr1_access": gstr1_success,
+                "hsn_access": hsn_success,
+                "gstr3b_access": gstr3b_success,
+                "itc_access": itc_success
+            }
+        )
+        
+        return all_reports_accessible
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Gold Jewellery ERP Backend API Tests")
