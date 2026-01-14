@@ -210,6 +210,47 @@ function AppRoutes() {
           </DashboardLayout>
         </PrivateRoute>
       } />
+
+      {/* Advanced Features */}
+      <Route path="/karigar" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <KarigarManagementPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/karat-pricing" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <KaratPricingPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/advanced-gst" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <AdvancedGSTPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/barcode" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <BarcodeQRPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/whatsapp" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <WhatsAppIntegrationPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
       
       {/* Default redirect */}
       <Route path="/" element={<Navigate to="/dashboard" />} />
