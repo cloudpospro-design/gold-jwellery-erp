@@ -19,6 +19,7 @@ import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import NotificationsPage from './pages/NotificationsPage';
 import CustomersPage from './pages/CustomersPage';
 import CustomerDetailPage from './pages/CustomerDetailPage';
+import SettingsPage from './pages/SettingsPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
