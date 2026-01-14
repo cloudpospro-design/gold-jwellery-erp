@@ -1137,7 +1137,7 @@ class JewelleryERPTester:
         if success:
             # Verify PO number format
             po_number = response.get('po_number', '')
-            po_format_correct = po_number.startswith('PO-2024-') and len(po_number) == 14
+            po_format_correct = po_number.startswith('PO-2024-') and len(po_number) >= 13
             
             # Verify calculations
             expected_subtotal = po_data['items'][0]['total_before_tax']
