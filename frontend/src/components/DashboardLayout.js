@@ -14,7 +14,12 @@ import {
   LogOut,
   Menu,
   X,
-  Bell
+  Bell,
+  Gem,
+  Calculator,
+  QrCode,
+  MessageCircle,
+  Hammer
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
@@ -37,8 +42,13 @@ const DashboardLayout = ({ children }) => {
     { icon: ShoppingCart, label: 'Sales', path: '/sales', permission: 'sales_read' },
     { icon: ShoppingBag, label: 'Purchase', path: '/purchase', permission: 'purchase_read' },
     { icon: UserCircle, label: 'Customers', path: '/customers', permission: 'customer_read' },
+    { icon: Hammer, label: 'Karigar', path: '/karigar', permission: 'inventory_read' },
+    { icon: Calculator, label: 'Karat Pricing', path: '/karat-pricing', permission: 'inventory_read' },
     { icon: FileText, label: 'GST Reports', path: '/gst-reports', permission: 'reports_read' },
+    { icon: Gem, label: 'Advanced GST', path: '/advanced-gst', permission: 'reports_read' },
     { icon: TrendingUp, label: 'Gold Rates', path: '/gold-rates', permission: 'inventory_read' },
+    { icon: QrCode, label: 'Barcode/QR', path: '/barcode', permission: 'inventory_read' },
+    { icon: MessageCircle, label: 'WhatsApp', path: '/whatsapp', permission: 'sales_all' },
     { icon: Bell, label: 'Notifications', path: '/notifications', permission: 'sales_all' },
     { icon: Settings, label: 'Settings', path: '/settings', permission: null },
   ];
