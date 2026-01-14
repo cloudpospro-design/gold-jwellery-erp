@@ -22,6 +22,7 @@ api_router = APIRouter(prefix="/api")
 
 # Import and include routers
 from routes import auth_routes, user_routes, inventory_routes, sales_routes, purchase_routes, gst_routes, gold_rates_routes, analytics_routes, notifications_routes, settings_routes
+from routes import karigar_routes, karat_pricing_routes, advanced_gst_routes, barcode_routes, whatsapp_routes
 
 api_router.include_router(auth_routes.router)
 api_router.include_router(user_routes.router)
@@ -33,6 +34,12 @@ api_router.include_router(gold_rates_routes.router)
 api_router.include_router(analytics_routes.router)
 api_router.include_router(notifications_routes.router)
 api_router.include_router(settings_routes.router)
+# Advanced feature routers
+api_router.include_router(karigar_routes.router)
+api_router.include_router(karat_pricing_routes.router)
+api_router.include_router(advanced_gst_routes.router)
+api_router.include_router(barcode_routes.router)
+api_router.include_router(whatsapp_routes.router)
 
 @api_router.get("/")
 async def root():
