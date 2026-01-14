@@ -30,6 +30,7 @@ const DashboardLayout = ({ children }) => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', permission: null },
+    { icon: TrendingUp, label: 'Analytics', path: '/analytics', permission: null },
     { icon: Users, label: 'User Management', path: '/users', permission: 'users_read' },
     { icon: Package, label: 'Inventory', path: '/inventory', permission: 'inventory_read' },
     { icon: ShoppingCart, label: 'Sales', path: '/sales', permission: 'sales_read' },
