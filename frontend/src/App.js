@@ -13,6 +13,7 @@ import CreateSalePage from './pages/CreateSalePage';
 import InvoiceDetailPage from './pages/InvoiceDetailPage';
 import PurchasePage from './pages/PurchasePage';
 import SuppliersPage from './pages/SuppliersPage';
+import GSTReportsPage from './pages/GSTReportsPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
