@@ -644,6 +644,333 @@ class JewelleryERPTester:
         
         return success
 
+    # ===== SALES MODULE TESTS =====
+    
+    def test_create_customer(self):
+        """Test creating customers with address details"""
+        if not self.token:
+            self.log_test("Create Customer", False, "No token available for authentication")
+            return False, None
+            
+        customer_data = {
+            "name": f"Test Customer {datetime.now().strftime('%H%M%S')}",
+            "email": f"customer_{datetime.now().strftime('%H%M%S')}@test.com",
+            "phone": "9876543210",
+            "gstin": "27ABCDE1234F1Z5",
+            "address": "123 Test Street, Test Area",
+            "city": "Mumbai",
+            "state": "Maharashtra",
+            "pincode": "400001"
+        }
+        
+        success, response = self.make_request('POST', 'sales/customers', customer_data, expected_status=201)
+        
+        if success:
+            # Verify all fields are present
+            required_fields = ['id', 'name', 'phone', 'address', 'city', 'state', 'pincode']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                details = f"Customer created but missing fields: {missing_fields}"
+                success = False
+            else:
+                details = f"Customer created with all required fields"
+        else:
+            details = "Failed to create customer"
+            
+        self.log_test(
+            "Create Customer with Address Details",
+            success,
+            details,
+            {"customer_id": response.get('id'), "has_all_fields": len(missing_fields) == 0 if success else False} if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_get_customers(self):
+        """Test getting all customers"""
+        if not self.token:
+            self.log_test("Get Customers", False, "No token available for authentication")
+            return False, []
+            
+        success, response = self.make_request('GET', 'sales/customers', expected_status=200)
+        
+        if success:
+            customer_count = len(response) if isinstance(response, list) else 0
+            details = f"Retrieved {customer_count} customers"
+        else:
+            details = "Failed to retrieve customers"
+            
+        self.log_test(
+            "Get All Customers",
+            success,
+            details,
+            {"customer_count": customer_count} if success else response
+        )
+        return success, response if success else []
+
+    def test_create_sale_with_gst_calculation(self):
+        """Test creating sale with automatic GST calculation and stock reduction"""
+        if not self.token:
+            self.log_test("Create Sale", False, "No token available for authentication")
+            return False, None
+            
+        # First ensure we have customers and products
+        customers_success, customers = self.test_get_customers()
+        if not customers_success or not customers:
+            # Create a customer for testing
+            customer_success, customer = self.test_create_customer()
+            if not customer_success:
+                self.log_test("Create Sale", False, "No customers available and failed to create test customer")
+                return False, None
+            customers = [customer]
+            
+        # Get products for sale
+        products_success, products = self.make_request('GET', 'inventory/products', expected_status=200)
+        if not products_success or not products:
+            self.log_test("Create Sale", False, "No products available for sale")
+            return False, None
+            
+        # Get product stock before sale
+        product = products[0]
+        original_stock = product['quantity']
+        
+        # Create sale data
+        sale_data = {
+            "customer_id": customers[0]['id'],
+            "items": [
+                {
+                    "product_id": product['id'],
+                    "product_name": product['name'],
+                    "sku": product['sku'],
+                    "quantity": 1,
+                    "unit_price": product['selling_price'],
+                    "hsn_code": product['hsn_code'],
+                    "gst_rate": product['gst_rate'],
+                    "total_before_tax": product['base_price'],
+                    "tax_amount": product['selling_price'] - product['base_price'],
+                    "total_after_tax": product['selling_price']
+                }
+            ],
+            "payment_method": "cash",
+            "notes": "Test sale for GST calculation"
+        }
+        
+        success, response = self.make_request('POST', 'sales/', sale_data, expected_status=201)
+        
+        if success:
+            # Verify invoice number format
+            invoice_number = response.get('invoice_number', '')
+            invoice_format_correct = invoice_number.startswith('INV-2024-') and len(invoice_number) == 14
+            
+            # Verify GST calculation based on customer state
+            customer_state = customers[0]['state']
+            gst_breakdown = response.get('gst_breakdown', {})
+            
+            if customer_state.lower() == 'maharashtra':
+                # Intra-state: CGST + SGST
+                gst_correct = (gst_breakdown.get('cgst', 0) > 0 and 
+                              gst_breakdown.get('sgst', 0) > 0 and 
+                              gst_breakdown.get('igst', 0) == 0)
+                gst_type = "CGST+SGST (intra-state)"
+            else:
+                # Inter-state: IGST
+                gst_correct = (gst_breakdown.get('igst', 0) > 0 and 
+                              gst_breakdown.get('cgst', 0) == 0 and 
+                              gst_breakdown.get('sgst', 0) == 0)
+                gst_type = "IGST (inter-state)"
+            
+            # Verify stock reduction
+            updated_product_success, updated_product = self.make_request('GET', f'inventory/products/{product["id"]}', expected_status=200)
+            stock_reduced = False
+            if updated_product_success:
+                new_stock = updated_product['quantity']
+                stock_reduced = new_stock == (original_stock - 1)
+            
+            all_checks_passed = invoice_format_correct and gst_correct and stock_reduced
+            details = f"Sale created - Invoice: {invoice_format_correct}, GST ({gst_type}): {gst_correct}, Stock reduced: {stock_reduced}"
+        else:
+            all_checks_passed = False
+            details = "Failed to create sale"
+            
+        self.log_test(
+            "Create Sale with GST Calculation & Stock Reduction",
+            success and all_checks_passed,
+            details,
+            {
+                "sale_id": response.get('id'),
+                "invoice_number": response.get('invoice_number'),
+                "gst_breakdown": response.get('gst_breakdown'),
+                "checks_passed": all_checks_passed
+            } if success else response
+        )
+        
+        return success, response if success else None
+
+    def test_get_sales_with_filters(self):
+        """Test getting sales with various filters"""
+        if not self.token:
+            self.log_test("Get Sales with Filters", False, "No token available for authentication")
+            return False
+            
+        # Test getting all sales
+        success, all_sales = self.make_request('GET', 'sales/', expected_status=200)
+        self.log_test(
+            "Get All Sales",
+            success,
+            f"Retrieved {len(all_sales)} sales" if success else "Failed to get sales",
+            {"sales_count": len(all_sales)} if success else all_sales
+        )
+        
+        if not success:
+            return False
+            
+        # Test status filter
+        success, completed_sales = self.make_request('GET', 'sales/?status=completed', expected_status=200)
+        self.log_test(
+            "Get Sales by Status - Completed",
+            success,
+            f"Retrieved {len(completed_sales)} completed sales" if success else "Failed to filter by status",
+            {"completed_sales_count": len(completed_sales)} if success else completed_sales
+        )
+        
+        return True
+
+    def test_get_single_sale(self):
+        """Test getting single sale by ID"""
+        if not self.token:
+            self.log_test("Get Single Sale", False, "No token available for authentication")
+            return False
+            
+        # Get sales list first
+        success, sales = self.make_request('GET', 'sales/', expected_status=200)
+        if not success or not sales:
+            self.log_test("Get Single Sale", False, "No sales available to test single sale retrieval")
+            return False
+            
+        sale_id = sales[0]['id']
+        success, response = self.make_request('GET', f'sales/{sale_id}', expected_status=200)
+        
+        if success:
+            # Verify all required fields are present
+            required_fields = ['id', 'invoice_number', 'customer', 'items', 'gst_breakdown', 'grand_total']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                details = f"Sale retrieved but missing fields: {missing_fields}"
+                success = False
+            else:
+                details = f"Sale {sale_id} retrieved with all required fields"
+        else:
+            details = f"Failed to retrieve sale {sale_id}"
+            
+        self.log_test(
+            "Get Single Sale by ID",
+            success,
+            details,
+            {"sale_id": sale_id, "has_all_fields": len(missing_fields) == 0 if success else False} if success else response
+        )
+        
+        return success
+
+    def test_sales_summary(self):
+        """Test sales summary statistics"""
+        if not self.token:
+            self.log_test("Sales Summary", False, "No token available for authentication")
+            return False
+            
+        success, response = self.make_request('GET', 'sales/summary', expected_status=200)
+        
+        if success:
+            # Verify summary fields
+            required_fields = ['total_sales', 'total_revenue', 'today_sales', 'today_revenue']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                details = f"Summary retrieved but missing fields: {missing_fields}"
+                success = False
+            else:
+                details = f"Summary: {response['total_sales']} total sales, ₹{response['total_revenue']} revenue"
+        else:
+            details = "Failed to retrieve sales summary"
+            
+        self.log_test(
+            "Sales Summary Statistics",
+            success,
+            details,
+            {
+                "total_sales": response.get('total_sales'),
+                "total_revenue": response.get('total_revenue'),
+                "today_stats": f"{response.get('today_sales')} sales, ₹{response.get('today_revenue')}"
+            } if success else response
+        )
+        
+        return success
+
+    def test_payment_method_tracking(self):
+        """Test different payment methods in sales"""
+        if not self.token:
+            self.log_test("Payment Method Tracking", False, "No token available for authentication")
+            return False
+            
+        payment_methods = ['cash', 'upi', 'card', 'bank_transfer']
+        
+        # Get existing customers and products
+        customers_success, customers = self.test_get_customers()
+        products_success, products = self.make_request('GET', 'inventory/products', expected_status=200)
+        
+        if not customers_success or not customers or not products_success or not products:
+            self.log_test("Payment Method Tracking", False, "No customers or products available for payment method testing")
+            return False
+            
+        payment_tests_passed = 0
+        
+        for method in payment_methods:
+            if len(products) == 0:
+                break
+                
+            product = products[0]
+            
+            # Check if product has enough stock
+            if product['quantity'] < 1:
+                continue
+                
+            sale_data = {
+                "customer_id": customers[0]['id'],
+                "items": [
+                    {
+                        "product_id": product['id'],
+                        "product_name": product['name'],
+                        "sku": product['sku'],
+                        "quantity": 1,
+                        "unit_price": product['selling_price'],
+                        "hsn_code": product['hsn_code'],
+                        "gst_rate": product['gst_rate'],
+                        "total_before_tax": product['base_price'],
+                        "tax_amount": product['selling_price'] - product['base_price'],
+                        "total_after_tax": product['selling_price']
+                    }
+                ],
+                "payment_method": method,
+                "notes": f"Test sale with {method} payment"
+            }
+            
+            success, response = self.make_request('POST', 'sales/', sale_data, expected_status=201)
+            
+            if success and response.get('payment_method') == method:
+                payment_tests_passed += 1
+                
+        all_methods_tested = payment_tests_passed == len(payment_methods)
+        
+        self.log_test(
+            "Payment Method Tracking",
+            all_methods_tested,
+            f"Successfully tested {payment_tests_passed}/{len(payment_methods)} payment methods",
+            {"methods_tested": payment_tests_passed, "total_methods": len(payment_methods)}
+        )
+        
+        return all_methods_tested
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Gold Jewellery ERP Backend API Tests")
