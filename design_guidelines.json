@@ -1,0 +1,131 @@
+{
+  "design_system": {
+    "name": "Gilded Ledger",
+    "description": "A professional, luxury-inspired ERP interface for the Indian Gold Jewellery market. Merges the precision of fintech with the elegance of high-end retail.",
+    "theme": "light",
+    "typography": {
+      "font_family": {
+        "heading": "Playfair Display, serif",
+        "body": "Manrope, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+        "h2": "text-3xl md:text-4xl font-semibold tracking-tight",
+        "h3": "text-2xl font-semibold",
+        "body_lg": "text-lg leading-relaxed",
+        "body_base": "text-base leading-relaxed",
+        "caption": "text-sm text-muted-foreground"
+      }
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "DEFAULT": "#D4AF37",
+          "foreground": "#FFFFFF",
+          "hover": "#B5952F"
+        },
+        "secondary": {
+          "DEFAULT": "#1C1917",
+          "foreground": "#FAFAF9"
+        },
+        "background": {
+          "DEFAULT": "#FAFAF9",
+          "paper": "#FFFFFF"
+        },
+        "muted": {
+          "DEFAULT": "#F5F5F4",
+          "foreground": "#78716C"
+        },
+        "accent": {
+          "success": "#059669",
+          "warning": "#D97706",
+          "error": "#DC2626",
+          "gold_light": "#FEFCE8"
+        },
+        "border": "#E7E5E4"
+      }
+    },
+    "visual_enhancers": {
+      "radius": "rounded-md",
+      "shadows": {
+        "card": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "hover": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "gold_glow": "0 0 15px rgba(212, 175, 55, 0.3)"
+      },
+      "glassmorphism": "bg-white/80 backdrop-blur-md border-b border-white/20",
+      "gradients": {
+        "gold_trace": "linear-gradient(90deg, transparent, #D4AF37, transparent)"
+      }
+    }
+  },
+  "layout_strategies": {
+    "dashboard": {
+      "type": "Control Room Grid",
+      "grid_cols": "grid-cols-1 md:grid-cols-12",
+      "gap": "gap-6",
+      "padding": "p-6 md:p-8"
+    },
+    "marketing": {
+      "type": "Tetris Grid",
+      "grid_cols": "grid-cols-1 md:grid-cols-12",
+      "gap": "gap-8 md:gap-12",
+      "padding": "p-8 md:p-12"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#D4AF37] text-white hover:bg-[#B5952F] shadow-sm transition-all duration-200 font-medium px-6 py-2 rounded-md",
+      "secondary": "bg-white text-[#1C1917] border border-[#E7E5E4] hover:bg-[#FAFAF9] hover:border-[#D4AF37] transition-all duration-200 font-medium px-6 py-2 rounded-md",
+      "ghost": "text-[#78716C] hover:text-[#D4AF37] hover:bg-[#FEFCE8] transition-colors duration-200"
+    },
+    "cards": {
+      "base": "bg-white border border-[#E7E5E4] rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-200",
+      "active": "bg-white border border-[#D4AF37] ring-1 ring-[#D4AF37]/20 rounded-lg shadow-md p-6 relative overflow-hidden"
+    },
+    "inputs": {
+      "base": "flex h-10 w-full rounded-md border border-[#E7E5E4] bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    }
+  },
+  "image_urls": {
+    "login_hero": {
+      "url": "https://images.unsplash.com/photo-1737515045459-365999ac9da0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxJbmRpYW4lMjBicmlkYWwlMjBqZXdlbGxlcnklMjBtb2RlbCUyMHBvcnRyYWl0JTIwaGlnaCUyMHJlc29sdXRpb258ZW58MHx8fHwxNzY4NDEwOTk1fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Indian bridal model with heavy gold jewellery, perfect for login/auth page background or hero section.",
+      "category": "hero"
+    },
+    "inventory_placeholders": [
+      {
+        "url": "https://images.unsplash.com/photo-1717282924526-07a7373bb142?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxnb2xkJTIwamV3ZWxsZXJ5JTIwbmVja2xhY2UlMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzY4NDEwOTgxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Gold necklace on white background, use for product catalog mockups.",
+        "category": "product"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1624365168775-0110f8105e7d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxnb2xkJTIwY29pbnMlMjBwaWxlJTIwbHV4dXJ5fGVufDB8fHx8MTc2ODQxMDk5OHww&ixlib=rb-4.1.0&q=85",
+        "description": "Gold coins pile, use for 'Gold Rate' or 'Assets' widget background.",
+        "category": "widget_bg"
+      }
+    ],
+    "store_ambiance": {
+      "url": "https://images.unsplash.com/photo-1678211786388-e460767cf5cc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBqZXdlbGxlcnklMjBzdG9yZSUyMGludGVyaW9yJTIwYmx1cnxlbnwwfHx8fDE3Njg0MTA5ODJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Blurred luxury store interior, use for subtle backgrounds or empty states.",
+      "category": "background"
+    }
+  },
+  "instructions_to_main_agent": {
+    "general": "You are building a Gold Jewellery ERP. The aesthetic must be 'Professional Luxury'. Think 'Old Money Tech'. Use the provided gold color (#D4AF37) sparingly as an accent, not a background. The base should be clean white/stone.",
+    "fonts": "Import 'Playfair Display' for headings and 'Manrope' for body from Google Fonts. This combination is non-negotiable for the brand identity.",
+    "layout": "Use the 'Control Room Grid' for the dashboard. It should feel dense but breathable. Use 'Glassmorphism' for the top navigation bar to give it a premium feel.",
+    "components": "Use Shadcn UI for all interactive elements (Forms, Tables, Dialogs). Customize them to match the 'Gilded Ledger' design system (e.g., change focus rings to Gold, use Serif fonts for Dialog titles).",
+    "charts": "Use Recharts (via Shadcn Charts). Style them with the Gold/Emerald/Charcoal palette. Avoid default rainbow colors.",
+    "gst_compliance": "Ensure all billing/invoice pages have dedicated fields for HSN Code, GSTIN, CGST, SGST, and IGST. This is a hard requirement.",
+    "mobile": "The design MUST be mobile-responsive. Use 'hidden md:block' for complex tables on mobile and replace them with 'Card Views' for smaller screens."
+  },
+  "universal_guidelines": [
+    "Do not use gradients for dark colors.",
+    "Avoid generic centered layouts.",
+    "Use glass-morphism with 12-24px blur.",
+    "Add micro-animations to all interactive elements.",
+    "Use 2-3x more spacing than typical designs.",
+    "All interactive elements MUST include data-testid attributes."
+  ]
+}
