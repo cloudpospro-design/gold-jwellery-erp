@@ -57,12 +57,14 @@ class JewelleryERPTester:
                 response = requests.post(url, json=data, headers=headers, timeout=10)
             elif method == 'PATCH':
                 response = requests.patch(url, json=data, headers=headers, timeout=10)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=headers, timeout=10)
             else:
                 return False, {"error": f"Unsupported method: {method}"}
 
             success = response.status_code == expected_status
             try:
-                response_data = response.json()
+                response_data = response.json() if response.text else {}
             except:
                 response_data = {"status_code": response.status_code, "text": response.text}
                 
