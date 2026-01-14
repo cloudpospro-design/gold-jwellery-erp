@@ -17,6 +17,8 @@ import GSTReportsPage from './pages/GSTReportsPage';
 import GoldRatesPage from './pages/GoldRatesPage';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import NotificationsPage from './pages/NotificationsPage';
+import CustomersPage from './pages/CustomersPage';
+import CustomerDetailPage from './pages/CustomerDetailPage';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
