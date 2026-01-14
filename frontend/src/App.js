@@ -26,6 +26,8 @@ import KaratPricingPage from './pages/KaratPricingPage';
 import AdvancedGSTPage from './pages/AdvancedGSTPage';
 import BarcodeQRPage from './pages/BarcodeQRPage';
 import WhatsAppIntegrationPage from './pages/WhatsAppIntegrationPage';
+// SuperAdmin
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import DashboardLayout from './components/DashboardLayout';
 import './App.css';
 
