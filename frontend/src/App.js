@@ -208,7 +208,7 @@ function AppRoutes() {
       <Route path="/settings" element={
         <PrivateRoute>
           <DashboardLayout>
-            <ComingSoon title="Settings" />
+            <SettingsPage />
           </DashboardLayout>
         </PrivateRoute>
       } />
