@@ -143,6 +143,14 @@ function AppRoutes() {
       } />
 
       {/* Coming Soon Pages */}
+      <Route path="/gst-reports" element={
+        <PrivateRoute>
+          <DashboardLayout>
+            <GSTReportsPage />
+          </DashboardLayout>
+        </PrivateRoute>
+      } />
+
       <Route path="/customers" element={
         <PrivateRoute>
           <DashboardLayout>
